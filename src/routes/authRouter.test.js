@@ -5,6 +5,7 @@ const { randomName, expectSuccessfulResponse, expectUnauthorizedResponse } = req
 const API_ROOT = '/api/auth';
 
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
+let testUserRegistered = false;
 let testUserAuthToken;
 let testUserServerResult;
 
@@ -27,7 +28,13 @@ async function registerNewUser() {
   return registerRes.body;
 }
 
-async function loginTestUser(user=testUser) {
+async function loginTestUser(user = testUser) {
+  if (user === testUser) {
+    if (!testUserRegistered) {
+      await registerNewUser();
+      testUserRegistered = true;
+    }
+  }
   const loginRes = await request(app).put(API_ROOT).send(user);
   expectSuccessfulResponse(loginRes);
   expectValidJwt(loginRes.body.token);
