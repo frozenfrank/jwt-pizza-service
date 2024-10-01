@@ -73,6 +73,13 @@ test('update invalid user', async () => {
   expectUnauthorizedResponse(updateRes, 403);
 });
 
+test('update invalid token', async () => {
+  const proposedUpdate = { email: "validemail@test.com", password: "validpassword" };
+  const invalidAuthToken = "NOT_A_REAL_AUTH_TOKEN";
+  const updateRes = await request(app).put(API_ROOT+"/invalid-user-id").set('Authorization', `Bearer ${invalidAuthToken}`).send(proposedUpdate);
+  expectUnauthorizedResponse(updateRes);
+});
+
 test('delete', async () => {
   // Create a new user
   const newUser = await registerNewUser();
@@ -87,6 +94,13 @@ test('delete', async () => {
   const updateRes = await request(app).put(API_ROOT+"/"+newUser.user.id).set('Authorization', `Bearer ${newUser.token}`).send(proposedUpdate);
   expect(updateRes.statusCode).not.toBe(200);
 });
+
+
+test('delete without auth token', async () => {
+  const deleteRes = await request(app).delete(API_ROOT).send();
+  expectUnauthorizedResponse(deleteRes);
+});
+
 
 function expectValidJwt(potentialJwt) {
   expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
