@@ -64,6 +64,12 @@ test('delete successful', async () => {
 
 test('create successful', createFranchise);
 
+test('create unauthorized', async () => {
+  const createFranchiseRequest = {name: `Test Franchise (${randomName()})`, admins: [{email: ADMIN_USER.email}]};
+  const createFranchiseRes = await asAdmin((r => r.post(API_ROOT)), false).send(createFranchiseRequest);
+  expect(createFranchiseRes.statusCode).toBe(403);
+});
+
 function asAdmin(func, admin=true) {
   let r = request(app);
   r = func(r);
