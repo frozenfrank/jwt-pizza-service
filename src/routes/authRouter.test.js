@@ -9,7 +9,7 @@ let testUserAuthToken;
 let testUserServerResult;
 
 beforeAll(async () => {
-  testUserServerResult =  await registerNewUser();
+  testUserServerResult = await registerNewUser();
   testUserAuthToken = testUserServerResult.token;
 });
 
