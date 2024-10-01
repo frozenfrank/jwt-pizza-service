@@ -10,7 +10,7 @@ function randomName() {
 }
 
 function expectSuccessfulResponse(res) {
-  expect(res.status).toBe(200);
+  expect(res.statusCode).toBe(200);
 }
 
 async function createAdminUser() {

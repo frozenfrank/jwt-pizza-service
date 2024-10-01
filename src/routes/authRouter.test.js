@@ -27,8 +27,8 @@ async function registerNewUser() {
   return registerRes.body;
 }
 
-async function loginTestUser() {
-  const loginRes = await request(app).put(API_ROOT).send(testUser);
+async function loginTestUser(user=testUser) {
+  const loginRes = await request(app).put(API_ROOT).send(user);
   expectSuccessfulResponse(loginRes);
   expectValidJwt(loginRes.body.token);
   return loginRes;
@@ -85,3 +85,5 @@ test('delete', async () => {
 function expectValidJwt(potentialJwt) {
   expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
 }
+
+exports.loginUser = loginTestUser;
