@@ -72,14 +72,21 @@ test('update invalid user', async () => {
   const updateRes = await request(app).put(API_ROOT+"/invalid-user-id").set('Authorization', `Bearer ${testUserAuthToken}`).send(updatedUser);
   expect(updateRes.statusCode).toBe(403);
   expect(updateRes.text).toContain("unauthorized");
-  // Response should be successful
-  // Response should contain the updated information
 });
 
 test('delete', async () => {
-  // Create new user
-  // Delete new user
-  // Expect subsequent write to fail
+  // Create a new user
+  const newUser = await registerNewUser();
+  expect(newUser).toBeTruthy();
+
+  // The request should delete the token
+  const deleteRes = await request(app).delete(API_ROOT).set('Authorization', `Bearer ${newUser.token}`).send();
+  expectSuccessfulResponse(deleteRes);
+
+  // Subsequent writes should fail
+  const proposedUpdate = { email: "validemail@test.com", password: "validpassword" };
+  const updateRes = await request(app).put(API_ROOT+"/"+newUser.user.id).set('Authorization', `Bearer ${newUser.token}`).send(proposedUpdate);
+  expect(updateRes.statusCode).not.toBe(200);
 });
 
 function expectValidJwt(potentialJwt) {
