@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../service');
-const { randomName, expectSuccessfulResponse } = require('./test-helper');
+const { randomName, expectSuccessfulResponse, expectUnauthorizedResponse } = require('./test-helper');
 
 const API_ROOT = '/api/auth';
 
@@ -70,8 +70,7 @@ test('update successfully', async () => {
 test('update invalid user', async () => {
   const updatedUser = {email: "bademail@test.com", password: "badpassword" };
   const updateRes = await request(app).put(API_ROOT+"/invalid-user-id").set('Authorization', `Bearer ${testUserAuthToken}`).send(updatedUser);
-  expect(updateRes.statusCode).toBe(403);
-  expect(updateRes.text).toContain("unauthorized");
+  expectUnauthorizedResponse(updateRes, 403);
 });
 
 test('delete', async () => {

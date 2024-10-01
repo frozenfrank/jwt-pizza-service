@@ -13,6 +13,11 @@ function expectSuccessfulResponse(res) {
   expect(res.statusCode).toBe(200);
 }
 
+function expectUnauthorizedResponse(res, errorStatusCode=401) {
+  expect(res.statusCode).toBe(errorStatusCode);
+  expect(res.text).toContain("unauthorized");
+}
+
 async function createAdminUser() {
   let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };
   user.name = randomName();
@@ -27,3 +32,4 @@ async function createAdminUser() {
 module.exports.randomName = randomName;
 module.exports.createAdminUser = createAdminUser;
 module.exports.expectSuccessfulResponse = expectSuccessfulResponse;
+module.exports.expectUnauthorizedResponse = expectUnauthorizedResponse;
