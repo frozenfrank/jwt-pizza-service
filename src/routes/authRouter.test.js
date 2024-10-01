@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../service');
-const { randomName } = require('./test-helper');
+const { randomName, expectSuccessfulResponse } = require('./test-helper');
 
 const API_ROOT = '/api/auth';
 
@@ -82,9 +82,6 @@ test('delete', async () => {
   // Expect subsequent write to fail
 });
 
-function expectSuccessfulResponse(res) {
-  expect(res.status).toBe(200);
-}
 function expectValidJwt(potentialJwt) {
   expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
 }

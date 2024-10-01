@@ -9,6 +9,10 @@ function randomName() {
   return Math.random().toString(36).substring(2, 12);
 }
 
+function expectSuccessfulResponse(res) {
+  expect(res.status).toBe(200);
+}
+
 async function createAdminUser() {
   let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };
   user.name = randomName();
@@ -22,3 +26,4 @@ async function createAdminUser() {
 
 module.exports.randomName = randomName;
 module.exports.createAdminUser = createAdminUser;
+module.exports.expectSuccessfulResponse = expectSuccessfulResponse;
