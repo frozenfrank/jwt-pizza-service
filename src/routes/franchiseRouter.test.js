@@ -1,8 +1,7 @@
 const request = require('supertest');
 const app = require('../service');
-const { createAdminUser, expectSuccessfulResponse, randomName } = require('./test-helper');
+const { createAdminUser, expectSuccessfulResponse, randomName, expectUnauthorizedResponse, randomInt } = require('./test-helper');
 const { loginUser, registerNewUser } = require('./authRouter.test');
-const { randomInt } = require('crypto');
 
 const API_ROOT = "/api/franchise/";
 let ADMIN_USER;
@@ -21,8 +20,6 @@ beforeAll(async () => {
   const nonAdminUserResult = await registerNewUser();
   NON_ADMIN_AUTH_TOKEN = nonAdminUserResult.token;
 })
-
-// const firstFranchise
 
 async function createFranchise() {
   const createFranchiseRequest = {name: `Test Franchise (${randomName()})`, admins: [{email: ADMIN_USER.email}]};
@@ -55,7 +52,7 @@ test('get my franchises', async () => {
 
 test('delete unauthorized', async () => {
   const deleteRes = await asAdmin(r => r.delete(API_ROOT+firstFranchise.id), false).send();
-  expect(deleteRes.statusCode).toBe(403);
+  expectUnauthorizedResponse(deleteRes, 403, null);
 });
 
 test('delete successful', async () => {
@@ -70,7 +67,7 @@ test('create successful', createFranchise);
 test('create unauthorized', async () => {
   const createFranchiseRequest = {name: `Test Franchise (${randomName()})`, admins: [{email: ADMIN_USER.email}]};
   const createFranchiseRes = await asAdmin((r => r.post(API_ROOT)), false).send(createFranchiseRequest);
-  expect(createFranchiseRes.statusCode).toBe(403);
+  expectUnauthorizedResponse(createFranchiseRes, 403, null);
 });
 
 test('create store', createStore);

@@ -28,9 +28,9 @@ function expectSuccessfulResponse(res) {
   expect(res.statusCode).toBe(200);
 }
 
-function expectUnauthorizedResponse(res, errorStatusCode=401) {
+function expectUnauthorizedResponse(res, errorStatusCode=401, errorMessage="unauthorized") {
   expect(res.statusCode).toBe(errorStatusCode);
-  expect(res.text).toContain("unauthorized");
+  if (errorMessage) expect(res.text).toContain(errorMessage);
 }
 
 async function createAdminUser() {
