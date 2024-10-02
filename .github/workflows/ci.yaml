@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: List installed packages
+        run: npm list --depth=0
+
       - name: Lint
         run: npm run lint
 
@@ -78,5 +81,6 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
-          git commit -m "NEW VERSION ($version): $coverage_pct % test coverage"
+          # How can I interpolate the value of $version in the commit message below?
+          git commit -m "NEW VERSION: $coverage_pct % test coverage"
           git push
