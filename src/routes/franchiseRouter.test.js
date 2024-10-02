@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../service');
-const { createAdminUser, expectSuccessfulResponse, randomName, expectUnauthorizedResponse, randomInt } = require('./test-helper');
+const { createAdminUser, expectSuccessfulResponse, randomName, expectUnauthorizedResponse } = require('./test-helper');
 const { loginUser, registerNewUser } = require('./authRouter.test');
 
 const API_ROOT = "/api/franchise/";
@@ -105,8 +105,8 @@ test('create store non-admin', async () => {
 });
 
 test('delete non-existent store', async () => {
-  const franchiseId = firstFranchise.id;
-  const deleteStoreRes = await asAdmin(r => r.delete(API_ROOT+"-1/store/-1")).send();
+  const franchiseId = -1;
+  const deleteStoreRes = await asAdmin(r => r.delete(API_ROOT+franchiseId+"/store/-1")).send();
   expectUnauthorizedResponse(deleteStoreRes, 403, null);
 });
 
