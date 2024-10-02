@@ -5,12 +5,12 @@ const { randomName, expectSuccessfulResponse, expectUnauthorizedResponse } = req
 const API_ROOT = '/api/auth';
 
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
-let testUserRegistered = false;
 let testUserAuthToken;
 let testUserServerResult;
 
 beforeAll(async () => {
   testUserServerResult = await registerNewUser();
+  testUser.email = testUserServerResult.user.email;
   testUserAuthToken = testUserServerResult.token;
 });
 
@@ -21,30 +21,24 @@ afterAll(async () => {
 });
 
 async function registerNewUser() {
-  testUser.email = randomName() + '@test.com';
-  const registerRes = await request(app).post(API_ROOT).send(testUser);
+  const newUser = {...testUser, email: randomName() + '@test.com'};
+  const registerRes = await request(app).post(API_ROOT).send(newUser);
   expectSuccessfulResponse(registerRes);
   expectValidJwt(registerRes.body.token);
   return registerRes.body;
 }
 
 async function loginTestUser(user = testUser) {
-  if (user === testUser) {
-    if (!testUserRegistered) {
-      await registerNewUser();
-      testUserRegistered = true;
-    }
-  }
   const loginRes = await request(app).put(API_ROOT).send(user);
   expectSuccessfulResponse(loginRes);
   expectValidJwt(loginRes.body.token);
-  return loginRes;
+  return loginRes.body;
 }
 
 test('login', async () => {
   const loginRes = await loginTestUser();
   const { password, ...user } = { ...testUser, roles: [{ role: 'diner' }] };
-  expect(loginRes.body.user).toMatchObject(user);
+  expect(loginRes.user).toMatchObject(user);
   expect(password).toBeTruthy(); // Use the variable to pass the linter
 });
 
@@ -113,4 +107,5 @@ function expectValidJwt(potentialJwt) {
   expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
 }
 
+exports.registerNewUser = registerNewUser;
 exports.loginUser = loginTestUser;

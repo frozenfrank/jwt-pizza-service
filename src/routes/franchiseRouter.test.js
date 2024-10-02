@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('../service');
 const { createAdminUser, expectSuccessfulResponse, randomName } = require('./test-helper');
-const { loginUser } = require('./authRouter.test');
+const { loginUser, registerNewUser } = require('./authRouter.test');
 
 const API_ROOT = "/api/franchise/";
 let ADMIN_USER;
@@ -12,11 +12,11 @@ let firstFranchise;
 beforeAll(async () => {
   ADMIN_USER = await createAdminUser();
   const adminUserResult = await loginUser(ADMIN_USER);
-  ADMIN_AUTH_TOKEN = adminUserResult.body.token;
+  ADMIN_AUTH_TOKEN = adminUserResult.token;
   firstFranchise = await createFranchise();
 
-  const nonAdminUserResult = await loginUser();
-  NON_ADMIN_AUTH_TOKEN = nonAdminUserResult.body.token;
+  const nonAdminUserResult = await registerNewUser();
+  NON_ADMIN_AUTH_TOKEN = nonAdminUserResult.token;
 })
 
 // const firstFranchise
@@ -28,7 +28,7 @@ async function createFranchise() {
 
   const createdFranchise = createFranchiseRes.body;
   expect(createdFranchise.name).toBe(createFranchiseRequest.name);
-  expect(createdFranchise.admins.map(a => a.email)).toContain(createFranchiseRequest.admins[0].email);
+  expect(createdFranchise.admins.map(a => a.email)).toContain(ADMIN_USER.email);
   return createdFranchise
 }
 
