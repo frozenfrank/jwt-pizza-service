@@ -98,6 +98,18 @@ async function createStore() {
   return createdStore;
 }
 
+test('create store non-admin', async () => {
+  const newStore = {franchiseId: firstFranchise.id, name: randomName() + " City"};
+  const createStoreRes = await asAdmin(r => r.post(API_ROOT+firstFranchise.id+"/store"), false).send(newStore);
+  expectUnauthorizedResponse(createStoreRes, 403, null);
+});
+
+test('delete non-existent store', async () => {
+  const franchiseId = firstFranchise.id;
+  const deleteStoreRes = await asAdmin(r => r.delete(API_ROOT+"-1/store/-1")).send();
+  expectUnauthorizedResponse(deleteStoreRes, 403, null);
+});
+
 function asAdmin(func, admin=true) {
   let r = request(app);
   r = func(r);
