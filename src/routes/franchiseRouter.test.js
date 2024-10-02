@@ -5,6 +5,7 @@ const { loginUser, registerNewUser } = require('./authRouter.test');
 
 const API_ROOT = "/api/franchise/";
 let ADMIN_USER;
+let ADMIN_USER_ID;
 let ADMIN_AUTH_TOKEN;
 let NON_ADMIN_AUTH_TOKEN;
 let firstFranchise;
@@ -12,6 +13,7 @@ let firstFranchise;
 beforeAll(async () => {
   ADMIN_USER = await createAdminUser();
   const adminUserResult = await loginUser(ADMIN_USER);
+  ADMIN_USER_ID = adminUserResult.user.id;
   ADMIN_AUTH_TOKEN = adminUserResult.token;
   firstFranchise = await createFranchise();
 
@@ -42,12 +44,12 @@ test('list', async () => {
 });
 
 test('get my franchises', async () => {
-  const getFranchiseRes = await asAdmin(r => r.get(API_ROOT+ADMIN_USER.id)).send();
+  const getFranchiseRes = await asAdmin(r => r.get(API_ROOT+ADMIN_USER_ID)).send();
   expectSuccessfulResponse(getFranchiseRes);
 
   const franchises = getFranchiseRes.body;
   expect(franchises.length).toBeGreaterThanOrEqual(1);
-  expect(franchises.admins.map(a => a.email)).toContain(ADMIN_USER.email);
+  expect(franchises.find(f => f.id === firstFranchise.id)).toMatchObject(firstFranchise);
 });
 
 test('delete unauthorized', async () => {
