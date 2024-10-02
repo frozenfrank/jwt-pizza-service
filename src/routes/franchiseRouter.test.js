@@ -2,6 +2,7 @@ const request = require('supertest');
 const app = require('../service');
 const { createAdminUser, expectSuccessfulResponse, randomName } = require('./test-helper');
 const { loginUser, registerNewUser } = require('./authRouter.test');
+const { randomInt } = require('crypto');
 
 const API_ROOT = "/api/franchise/";
 let ADMIN_USER;
@@ -71,6 +72,34 @@ test('create unauthorized', async () => {
   const createFranchiseRes = await asAdmin((r => r.post(API_ROOT)), false).send(createFranchiseRequest);
   expect(createFranchiseRes.statusCode).toBe(403);
 });
+
+test('create store', createStore);
+
+test('delete store', async () => {
+  // Create a new store
+  const newStore = await createStore();
+
+  // Delete the store
+  const franchiseId = firstFranchise.id;
+  const deleteStoreRes = await asAdmin(r => r.delete(API_ROOT+franchiseId+"/store/"+newStore.id)).send();
+  expectSuccessfulResponse(deleteStoreRes);
+  expect(deleteStoreRes.text).toContain("store deleted");
+
+  // Expect the store to be erased
+  const getFranchisesRes = await asAdmin(r => r.get(API_ROOT+ADMIN_USER_ID)).send();
+  expectSuccessfulResponse(getFranchisesRes);
+  expect(getFranchisesRes.body.map(f => f.id)).not.toContain(newStore.id);
+})
+
+async function createStore() {
+  const newStore = {franchiseId: firstFranchise.id, name: randomName() + " City"};
+  const createStoreRes = await asAdmin(r => r.post(API_ROOT+firstFranchise.id+"/store")).send(newStore);
+  expectSuccessfulResponse(createStoreRes);
+
+  const createdStore = createStoreRes.body;
+  expect(createdStore).toMatchObject(newStore);
+  return createdStore;
+}
 
 function asAdmin(func, admin=true) {
   let r = request(app);

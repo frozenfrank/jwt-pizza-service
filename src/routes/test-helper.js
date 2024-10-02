@@ -9,6 +9,21 @@ function randomName() {
   return Math.random().toString(36).substring(2, 12);
 }
 
+/**
+ * Returns a random integer between min (inclusive) and max (inclusive).
+ * The value is no lower than min (or the next integer greater than min
+ * if min isn't an integer) and no greater than max (or the next integer
+ * lower than max if max isn't an integer).
+ * Using Math.round() will give you a non-uniform distribution!
+ *
+ * Credit: https://stackoverflow.com/a/1527820/2844859
+ */
+function randomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function expectSuccessfulResponse(res) {
   expect(res.statusCode).toBe(200);
 }
@@ -30,6 +45,7 @@ async function createAdminUser() {
 }
 
 module.exports.randomName = randomName;
+module.exports.randomInt = randomInt;
 module.exports.createAdminUser = createAdminUser;
 module.exports.expectSuccessfulResponse = expectSuccessfulResponse;
 module.exports.expectUnauthorizedResponse = expectUnauthorizedResponse;
