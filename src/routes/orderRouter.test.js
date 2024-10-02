@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../service');
-const { expectSuccessfulResponse, randomName, createAdminUser } = require('./test-helper');
+const { expectSuccessfulResponse, randomName, createAdminUser, expectUnauthorizedResponse } = require('./test-helper');
 const { registerNewUser, loginUser } = require('./authRouter.test');
 const { randomInt } = require('crypto');
 
@@ -37,9 +37,15 @@ test('get menu', async () => {
 
 test('add menu item', addMenuItem);
 
-async function addMenuItem(admin = true) {
+test('add menu item non-admin', async () => {
   const newItem = {title: randomName(), description: "Lame item description", image: randomName() + ".png", price: randomInt(1, 10000)/100};
-  const addMenuRes = await sendRequest(r => r.put(API_ROOT+"menu"), true, admin).send(newItem);
+  const addMenuRes = await sendRequest(r => r.put(API_ROOT+"menu"), true, false).send(newItem);
+  expectUnauthorizedResponse(addMenuRes, 403, null);
+});
+
+async function addMenuItem() {
+  const newItem = {title: randomName(), description: "Lame item description", image: randomName() + ".png", price: randomInt(1, 10000)/100};
+  const addMenuRes = await sendRequest(r => r.put(API_ROOT+"menu"), true, true).send(newItem);
   expectSuccessfulResponse(addMenuRes);
 
   const addedItem = addMenuRes.body.find(i => i.title === newItem.title);
