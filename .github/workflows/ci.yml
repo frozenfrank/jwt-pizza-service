@@ -82,5 +82,5 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           # How can I interpolate the value of $version in the commit message below?
-          git commit -m "NEW VERSION: $coverage_pct % test coverage"
+          git commit -m "NEW VERSION (${{steps.set_version.outputs.version}}): $coverage_pct % test coverage"
           git push
