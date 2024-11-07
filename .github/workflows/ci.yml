@@ -74,6 +74,7 @@ jobs:
           printf '{"version": "%s" }' "$version" > src/version.json
 
       - name: Update coverage
+        if: env.VERBOSE_RELEASE_COMMIT == 'true'
         run: |
           coverage_pct=$(grep -o '"pct":[0-9.]*' coverage/coverage-summary.json | head -n 1 | cut -d ':' -f 2)
           color=$(echo "$coverage_pct < 80" | bc -l | awk '{if ($1) print "yellow"; else print "green"}')
@@ -83,6 +84,12 @@ jobs:
           git add .
           git commit -m "NEW VERSION (${{steps.set_version.outputs.version}}): $coverage_pct % test coverage"
           git push
+
+      - name: Skip updating coverage
+        if: env.VERBOSE_RELEASE_COMMIT != 'true'
+        run: |
+          git tag ${{steps.set_version.outputs.version}}
+          git push --tags
 
       - name: Create dist
         run: |
