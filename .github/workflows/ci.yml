@@ -108,6 +108,8 @@ jobs:
     needs: compile
     env:
       version: ${{ needs.compile.outputs.version }}
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
     steps:
       - name: Download distribution artifact
         uses: actions/download-artifact@v4
@@ -139,23 +141,13 @@ jobs:
         run: |
           docker build --platform=${{ vars.DOCKER_BUILD_PLATFORM }} \
             --provenance=false -t $ECR_REGISTRY/$ECR_REPOSITORY --push .
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:latest" >>  $GITHUB_OUTPUT
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:latest" >> $GITHUB_OUTPUT
 
-      - name: Download task definition
-        run: |
-          aws ecs describe-task-definition \
-            --region ${{ vars.AWS_REGION }} \
-            --task-definition ${{ vars.AWS_TASK_DEFINITION_ID }} \
-            --query taskDefinition \
-            > task-definition.json
-          echo $(cat task-definition.json \
-            | jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .revision, .status, .registeredAt, .registeredBy)') \
-            > task-definition.json
-
-      - name: Deploy new task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          service: ${{ vars.AWS_SERVICE_NAME }}
-          cluster: ${{ vars.AWS_CLUSTER_NAME }}
-          wait-for-service-stability: false
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    needs: build
+    steps:
+      - name: Run Reusable Workflow
+        uses: ./.github/workflows/deploy-task-definition.yml
