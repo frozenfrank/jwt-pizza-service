@@ -139,3 +139,11 @@ jobs:
         run: |
           docker build --platform=linux/arm64 --provenance=false -t $ECR_REGISTRY/$ECR_REPOSITORY --push .
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:latest" >>  $GITHUB_OUTPUT
+
+      - name: Redeploy ECS Service
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.AWS_CLUSTER_NAME }} \
+            --service ${{ env.AWS_SERVICE_NAME }} \
+            --force-new-deployment
+            --region
