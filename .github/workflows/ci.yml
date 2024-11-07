@@ -139,10 +139,15 @@ jobs:
           docker build --platform=${{ vars.DOCKER_BUILD_PLATFORM }} --provenance=false -t $ECR_REGISTRY/$ECR_REPOSITORY --push .
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:latest" >>  $GITHUB_OUTPUT
 
-      - name: Redeploy ECS Service
+      - name: Download task definition
         run: |
-          aws ecs update-service \
-            --cluster ${{ vars.AWS_CLUSTER_NAME }} \
-            --service ${{ vars.AWS_SERVICE_NAME }} \
-            --force-new-deployment \
-            --region ${{ vars.AWS_REGION }}
+          aws ecs describe-task-definition --region ${{ vars.AWS_REGION }} --task-definition ${{ vars.AWS_TASK_DEFINITION_ID }} --query taskDefinition > task-definition.json
+          echo $(cat task-definition.json | jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .revision, .status, .registeredAt, .registeredBy)') > task-definition.json
+
+      - name: Deploy new task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          service: ${{ vars.AWS_SERVICE_NAME }}
+          cluster: ${{ vars.AWS_CLUSTER_NAME }}
+          wait-for-service-stability: false
