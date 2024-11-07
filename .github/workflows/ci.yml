@@ -118,7 +118,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           audience: sts.amazonaws.com
-          aws-region: us-east-1
+          aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.CI_IAM_ROLE }}
 
       - name: Login to Amazon ECR
@@ -137,13 +137,13 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: 'jwt-pizza-service'
         run: |
-          docker build --platform=linux/arm64 --provenance=false -t $ECR_REGISTRY/$ECR_REPOSITORY --push .
+          docker build --platform=${{ vars.DOCKER_BUILD_PLATFORM }} --provenance=false -t $ECR_REGISTRY/$ECR_REPOSITORY --push .
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:latest" >>  $GITHUB_OUTPUT
 
       - name: Redeploy ECS Service
         run: |
           aws ecs update-service \
-            --cluster ${{ env.AWS_CLUSTER_NAME }} \
-            --service ${{ env.AWS_SERVICE_NAME }} \
+            --cluster ${{ vars.AWS_CLUSTER_NAME }} \
+            --service ${{ vars.AWS_SERVICE_NAME }} \
             --force-new-deployment
-            --region
+            --region ${{ vars.AWS_REGION }}
