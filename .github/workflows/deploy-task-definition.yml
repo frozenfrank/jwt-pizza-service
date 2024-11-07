@@ -4,7 +4,13 @@ name: Deploy Task Definition
 on:
   workflow_call:
   workflow_dispatch:
+    inputs:
+      version:
+        description: The version number being deployed
+        required: true
+        default: ""
 jobs:
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
@@ -36,3 +42,10 @@ jobs:
           service: ${{ vars.AWS_SERVICE_NAME }}
           cluster: ${{ vars.AWS_CLUSTER_NAME }}
           wait-for-service-stability: false
+
+      - name: Annotate Grafana dashboard
+        run: |
+          curl -s -X POST https://${{ secrets.GRAFANA_ACCOUNT }}.grafana.net/api/annotations \
+            -H "Authorization: Bearer ${{ secrets.GRAFANA_TOKEN }}" \
+            -H "Content-Type:application/json" \
+            -d '{"dashboardUID":"${{ vars.GRAFANA_DASHBOARD_ID }}", "panelId":${{ vars.GRAFANA_PANEL_ID }}, "tags":["backend","production"], "text":"Version '"$INPUT_VERSION"' deployed" }'
