@@ -81,7 +81,6 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
-          # How can I interpolate the value of $version in the commit message below?
           git commit -m "NEW VERSION (${{steps.set_version.outputs.version}}): $coverage_pct % test coverage"
           git push
 
@@ -145,5 +144,5 @@ jobs:
           aws ecs update-service \
             --cluster ${{ vars.AWS_CLUSTER_NAME }} \
             --service ${{ vars.AWS_SERVICE_NAME }} \
-            --force-new-deployment
+            --force-new-deployment \
             --region ${{ vars.AWS_REGION }}
