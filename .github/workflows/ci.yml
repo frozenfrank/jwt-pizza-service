@@ -156,8 +156,8 @@ jobs:
     needs: build
     permissions:
       id-token: write
-    # secrets: inherit
-    # uses: ./.github/workflows/deploy-task-definition.yml
+    env:
+      version: ${{ needs.compile.outputs.version }}
     steps:
       - name: Create OIDC token to AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -184,3 +184,10 @@ jobs:
           service: ${{ vars.AWS_SERVICE_NAME }}
           cluster: ${{ vars.AWS_CLUSTER_NAME }}
           wait-for-service-stability: false
+
+      - name: Annotate Grafana dashboard
+        run: |
+          curl -s -X POST https://${{ secrets.GRAFANA_ACCOUNT }}.grafana.net/api/annotations \
+            -H "Authorization: Bearer ${{ secrets.GRAFANA_TOKEN }}" \
+            -H "Content-Type:application/json" \
+            -d '{"dashboardUID":"${{ vars.GRAFANA_DASHBOARD_ID }}", "panelId":${{ vars.GRAFANA_PANEL_ID }}, "tags":["backend","production"], "text":"Version '"$version"' deployed" }'
