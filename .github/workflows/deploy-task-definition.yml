@@ -53,7 +53,9 @@ jobs:
 
       - name: Annotate Grafana dashboard
         run: |
+          version=${version:-'${{ inputs.version              }}'}  # workflow_call
+          version=${version:-'${{ github.event.inputs.version }}'}  # workflow_dispatch
           curl -s -X POST https://${{ secrets.GRAFANA_ACCOUNT }}.grafana.net/api/annotations \
             -H "Authorization: Bearer ${{ secrets.GRAFANA_TOKEN }}" \
             -H "Content-Type:application/json" \
-            -d '{"dashboardUID":"${{ vars.GRAFANA_DASHBOARD_ID }}", "panelId":${{ vars.GRAFANA_PANEL_ID }}, "tags":["backend","production"], "text":"Version '"'"'${{ inputs.version }}'"'"' deployed" }'
+            -d '{"dashboardUID":"${{ vars.GRAFANA_DASHBOARD_ID }}", "panelId":${{ vars.GRAFANA_PANEL_ID }}, "tags":["backend","production"], "text":"Version '"'$version'"' deployed" }'
