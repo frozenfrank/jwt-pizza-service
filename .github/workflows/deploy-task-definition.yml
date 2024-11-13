@@ -3,14 +3,22 @@ name: Deploy Task Definition
 
 on:
   workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
+        default: ""
+        description: The version number being deployed
+
   workflow_dispatch:
     inputs:
       version:
-        description: The version number being deployed
+        type: string
         required: true
         default: ""
-jobs:
+        description: The version number being deployed
 
+jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
@@ -48,4 +56,4 @@ jobs:
           curl -s -X POST https://${{ secrets.GRAFANA_ACCOUNT }}.grafana.net/api/annotations \
             -H "Authorization: Bearer ${{ secrets.GRAFANA_TOKEN }}" \
             -H "Content-Type:application/json" \
-            -d '{"dashboardUID":"${{ vars.GRAFANA_DASHBOARD_ID }}", "panelId":${{ vars.GRAFANA_PANEL_ID }}, "tags":["backend","production"], "text":"Version '"$INPUT_VERSION"' deployed" }'
+            -d '{"dashboardUID":"${{ vars.GRAFANA_DASHBOARD_ID }}", "panelId":${{ vars.GRAFANA_PANEL_ID }}, "tags":["backend","production"], "text":"Version '"'"'${{ inputs.version }}'"'"' deployed" }'
