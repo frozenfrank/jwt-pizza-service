@@ -43,6 +43,7 @@ orderRouter.endpoints = [
 // getMenu
 orderRouter.get(
   '/menu',
+  authRouter.failOnChaos,
   asyncHandler(async (req, res) => {
     res.send(await DB.getMenu());
   })
@@ -67,6 +68,7 @@ orderRouter.put(
 orderRouter.get(
   '/',
   authRouter.authenticateToken,
+  authRouter.failOnChaos,
   asyncHandler(async (req, res) => {
     res.json(await DB.getOrders(req.user, req.query.page));
   })
