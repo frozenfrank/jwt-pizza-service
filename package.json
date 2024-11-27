@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "cd src && node index.js",
+    "populate:db": "./populate-db-values.sh",
     "test": "jest",
     "lint": "eslint ."
   },
