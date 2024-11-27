@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Verify HOST
+host="$1"
 if [[ -z "$host" ]]; then
-  echo "HOST variable is not defined."
-  echo "Run: export host=https://pizza-service.example.com"
+  echo "Usage: $0 <PIZZA_SERVICE_HOST_URL>"
   exit 1
 else
   echo "Populating default values to: $host"
