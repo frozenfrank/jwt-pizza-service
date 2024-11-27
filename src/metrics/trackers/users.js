@@ -8,6 +8,8 @@ class UserMetricsTracker extends MetricsTracker {
 
   constructor(generator) {
     super("users", generator);
+    this.metrics.unauthenticated_requests = 0;
+
     this.activeUsers_hour = new Set();
     this.activeUsers_day = new Set();
     this.activeUsers_week = new Set();
@@ -15,12 +17,17 @@ class UserMetricsTracker extends MetricsTracker {
   }
 
   trackActiveUser(userIdentifier) {
+    if (!userIdentifier) {
+      this.metrics.unauthenticated_requests++;
+      return;
+    }
     this.activeUsers_hour.add(userIdentifier);
     this.activeUsers_day.add(userIdentifier);
     this.activeUsers_week.add(userIdentifier);
   }
 
   /* override */ flush() {
+    super.flush();
     const usersMetrics /*: UserMetrics */ = {
       active_hour: this.activeUsers_hour.size(),
       active_day: this.activeUsers_day.size(),
