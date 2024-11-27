@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Verify HOST
+if [[ -z "$host" ]]; then
+  echo "HOST variable is not defined."
+  echo "Run: export host=https://pizza-service.example.com"
+  exit 1
+else
+  echo "Populating default values to: $host"
+fi
+
 # Login as admin
 response=$(curl -s -X PUT $host/api/auth -d '{"email":"a@jwt.com", "password":"admin"}' -H 'Content-Type: application/json')
 token=$(echo $response | jq -r '.token')
@@ -16,6 +25,7 @@ curl -X PUT $host/api/order/menu -H 'Content-Type: application/json' -d '{ "titl
 curl -X PUT $host/api/order/menu -H 'Content-Type: application/json' -d '{ "title":"Crusty", "description": "A dry mouthed favorite", "image":"pizza4.png", "price": 0.0028 }'  -H "Authorization: Bearer $token"
 curl -X PUT $host/api/order/menu -H 'Content-Type: application/json' -d '{ "title":"Charred Leopard", "description": "For those with a darker side", "image":"pizza5.png", "price": 0.0099 }'  -H "Authorization: Bearer $token"
 
+# Add franchise
 curl -X POST $host/api/franchise -H 'Content-Type: application/json' -d '{"name": "pizzaPocket", "admins": [{"email": "f@jwt.com"}]}'  -H "Authorization: Bearer $token"
 
 # Add store
