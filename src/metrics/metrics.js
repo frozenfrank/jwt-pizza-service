@@ -55,7 +55,7 @@ class Metrics {
   }
 
   trackPizzaCreationLatency(fn) {
-    this.trackers.Latency.logLatency("factory", fn);
+    return this.trackers.Latency.logLatency("factory", fn);
   }
 
   // Internal helpers

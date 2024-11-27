@@ -2,6 +2,7 @@ const express = require('express');
 const config = require('../config.js');
 const { Role, DB } = require('../database/database.js');
 const { authRouter } = require('./authRouter.js');
+const metrics = require('../metrics/metrics.js');
 const { asyncHandler, StatusCodeError } = require('../endpointHelper.js');
 
 const orderRouter = express.Router();
@@ -81,11 +82,12 @@ orderRouter.post(
   asyncHandler(async (req, res) => {
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
-    const r = await fetch(`${config.factory.url}/api/order`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', authorization: `Bearer ${config.factory.apiKey}` },
-      body: JSON.stringify({ diner: { id: req.user.id, name: req.user.name, email: req.user.email }, order }),
-    });
+    const r = await metrics.trackPizzaCreationLatency(
+      () => fetch(`${config.factory.url}/api/order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', authorization: `Bearer ${config.factory.apiKey}` },
+        body: JSON.stringify({ diner: { id: req.user.id, name: req.user.name, email: req.user.email }, order }),
+      }));
     const j = await r.json();
     if (r.ok) {
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });

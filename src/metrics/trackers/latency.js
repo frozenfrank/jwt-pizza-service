@@ -6,10 +6,10 @@ class LatencyMetricsTracker extends MetricsTracker {
     super("lat", generator);
   }
 
-  logLatency(metricName, fn) {
+  async logLatency(metricName, fn) {
     const start = new Date();
     try {
-      fn();
+      return await fn();
     } catch (error) {
       const metricNameStr = metricName+"_failures";
       this.metrics[metricNameStr] ||= 0;
