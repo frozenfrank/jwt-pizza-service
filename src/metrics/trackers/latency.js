@@ -4,7 +4,6 @@ class LatencyMetricsTracker extends MetricsTracker {
 
   constructor(generator) {
     super("lat", generator);
-    this.metrics.lat_failed_requests = 0;
   }
 
   logLatency(metricName, fn) {
@@ -12,7 +11,9 @@ class LatencyMetricsTracker extends MetricsTracker {
     try {
       fn();
     } catch (error) {
-      this.metrics.lat_failed_requests++;
+      const metricNameStr = metricName+"_failures";
+      this.metrics[metricNameStr] ||= 0;
+      this.metrics[metricNameStr]++;
       throw error;
     } finally {
       const end = new Date();

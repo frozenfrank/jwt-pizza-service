@@ -52,6 +52,7 @@ export interface SalesMetrics {
 
 export interface LatencyMetrics {
   lat_service: InstantNumber;
-  lat_pizza_creation: InstantNumber;
-  lat_failed_requests: AccumulatorNumber;
+  lat_factory: InstantNumber;
+  lat_service_failures: AccumulatorNumber;
+  lat_factory_failures: AccumulatorNumber;
 }
