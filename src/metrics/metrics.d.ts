@@ -1,3 +1,6 @@
+export type AccumulatorNumber = number;
+export type InstantNumber = number;
+
 /** Unless specified otherwise, all of the following will be accumulator values. */
 export type PizzaServiceMetrics =
   HttpMetrics &
@@ -5,49 +8,49 @@ export type PizzaServiceMetrics =
   AuthMetrics;
 
 export interface HttpMetrics {
-  http_requests_total: number;
+  http_requests_total: AccumulatorNumber;
 
-  http_requests_get: number;
-  http_requests_put: number;
-  http_requests_delete: number;
-  http_requests_post: number;
+  http_requests_get: AccumulatorNumber;
+  http_requests_put: AccumulatorNumber;
+  http_requests_delete: AccumulatorNumber;
+  http_requests_post: AccumulatorNumber;
 
-  http_results_100: number;
-  http_results_200: number;
-  http_results_300: number;
-  http_results_400: number;
-  http_results_500: number;
+  http_results_100: AccumulatorNumber;
+  http_results_200: AccumulatorNumber;
+  http_results_300: AccumulatorNumber;
+  http_results_400: AccumulatorNumber;
+  http_results_500: AccumulatorNumber;
 
   /** Any 200 status code */
-  http_results_success: number;
+  http_results_success: AccumulatorNumber;
   /** Any non-200 status code */
-  http_results_error: number;
+  http_results_error: AccumulatorNumber;
 }
 
 export interface UserMetrics {
-  users_active_hour: number;
-  users_active_day: number;
-  users_active_week: number;
+  users_active_hour: InstantNumber;
+  users_active_day: InstantNumber;
+  users_active_week: InstantNumber;
 }
 
 export interface AuthMetrics {
-  auth_successful: number;
-  auth_failed: number;
+  auth_successful: AccumulatorNumber;
+  auth_failed: AccumulatorNumber;
 }
 
 export interface SystemMetrics {
-  sys_cpu: number;
-  sys_mem: number;
+  sys_cpu: InstantNumber;
+  sys_mem: InstantNumber;
 }
 
 export interface SalesMetrics {
-  sales_qty: number;
-  sales_failed_requests: number;
-  sales_revenue: number;
+  sales_qty: AccumulatorNumber;
+  sales_failed_requests: AccumulatorNumber;
+  sales_revenue: AccumulatorNumber;
 }
 
 export interface LatencyMetrics {
-  lat_service: number;
-  lat_pizza_creation: number;
-  lat_failed_requests: number;
+  lat_service: InstantNumber;
+  lat_pizza_creation: InstantNumber;
+  lat_failed_requests: AccumulatorNumber;
 }
