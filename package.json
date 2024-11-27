@@ -6,6 +6,7 @@
   "scripts": {
     "start": "cd src && node index.js",
     "populate:db": "./populate_db_values.sh",
+    "start:traffic": "./simulate_traffic.sh",
     "test": "jest",
     "lint": "eslint ."
   },
