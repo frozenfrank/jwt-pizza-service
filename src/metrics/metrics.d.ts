@@ -5,7 +5,10 @@ export type InstantNumber = number;
 export type PizzaServiceMetrics =
   HttpMetrics &
   UserMetrics &
-  AuthMetrics;
+  AuthMetrics &
+  SystemMetrics &
+  SalesMetrics &
+  LatencyMetrics;
 
 export interface HttpMetrics {
   http_requests_total: AccumulatorNumber;
