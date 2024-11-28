@@ -3,7 +3,21 @@ name: Deploy Task Definition
 
 on:
   workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
+        default: ""
+        description: The version number being deployed
+
   workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        required: true
+        default: ""
+        description: The version number being deployed
+
 jobs:
   deploy:
     name: Deploy
@@ -18,9 +32,30 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.CI_IAM_ROLE }}
 
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition \
+            --region ${{ vars.AWS_REGION }} \
+            --task-definition ${{ vars.AWS_TASK_DEFINITION_ID }} \
+            --query taskDefinition \
+            > task-definition.json
+          echo $(cat task-definition.json \
+            | jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .revision, .status, .registeredAt, .registeredBy)') \
+            > task-definition.json
+
       - name: Deploy new task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
+          task-definition: task-definition.json
           service: ${{ vars.AWS_SERVICE_NAME }}
           cluster: ${{ vars.AWS_CLUSTER_NAME }}
           wait-for-service-stability: false
+
+      - name: Annotate Grafana dashboard
+        run: |
+          version=${version:-'${{ inputs.version              }}'}  # workflow_call
+          version=${version:-'${{ github.event.inputs.version }}'}  # workflow_dispatch
+          curl -s -X POST https://${{ secrets.GRAFANA_ACCOUNT }}.grafana.net/api/annotations \
+            -H "Authorization: Bearer ${{ secrets.GRAFANA_TOKEN }}" \
+            -H "Content-Type:application/json" \
+            -d '{"dashboardUID":"${{ vars.GRAFANA_DASHBOARD_ID }}", "panelId":${{ vars.GRAFANA_PANEL_ID }}, "tags":["backend","production"], "text":"Version '"'$version'"' deployed" }'

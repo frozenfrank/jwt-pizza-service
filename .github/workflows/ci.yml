@@ -66,7 +66,7 @@ jobs:
       - name: Tests
         run: npm test
 
-      - name: set version
+      - name: Set version
         id: set_version
         run: |
           version=$(date +'%Y%m%d.%H%M%S')
@@ -152,6 +152,8 @@ jobs:
 
   publish:
     name: Publish
-    needs: build
+    needs: [compile, build]
     secrets: inherit
+    with:
+      version: ${{ needs.compile.outputs.version }}
     uses: ./.github/workflows/deploy-task-definition.yml

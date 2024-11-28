@@ -63,6 +63,30 @@ authRouter.authenticateToken = (req, res, next) => {
   next();
 };
 
+let enableChaos = false;
+
+// Enable/disable chaos
+authRouter.put(
+  '/chaos/:state',
+  authRouter.authenticateToken,
+  asyncHandler(async (req, res) => {
+    if (!req.user.isRole(Role.Admin)) {
+      return res.status(404).send({ message: 'unauthorized' });
+    }
+
+    enableChaos = req.params.state === 'true';
+    res.json({ chaos: enableChaos });
+  })
+);
+
+// Fail on Chaos
+authRouter.failOnChaos = (_req, res, next) => {
+  if (enableChaos) {
+    return res.status(401).send({ message: 'chaos!' });
+  }
+  next();
+};
+
 // register
 authRouter.post(
   '/',
