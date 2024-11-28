@@ -1,4 +1,4 @@
-const config = require('../config.json').metrics;
+const config = require('../config.js').metrics;
 const MetricGenerator = require('./generator.js');
 const AuthMetricsTracker = require('./trackers/auth.js');
 const HttpMetricsTracker = require('./trackers/http.js');
@@ -14,7 +14,7 @@ class Metrics {
   // private periodicTimer: NodeJS.Timeout;
 
   constructor() {
-    const generator = new MetricGenerator(config.metrics.source);
+    const generator = new MetricGenerator(config.source);
     this.generator = generator;
     this.trackers = {
       Http: new HttpMetricsTracker(generator),

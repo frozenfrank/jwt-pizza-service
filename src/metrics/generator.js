@@ -28,7 +28,7 @@ class MetricGenerator {
     // Pull items from the buffer in a single operation to maximize thread safety.
     const buffered = this.buffer.splice(0, this.buffer.length);
     return buffered.map(met => {
-      const {prefix, now, metrics} = met;
+      const {prefix, now, ...metrics} = met;
       return this.formatPromString(prefix, serializeMetrics(metrics), now);
     }).join("\n");
   }

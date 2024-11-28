@@ -8,7 +8,7 @@
       "program": "index.js",
       "request": "launch",
       "restart": true,
-      "runtimeExecutable": "nodemon",
+      // "runtimeExecutable": "nodemon",
       "args": ["3000"],
       "cwd": "${workspaceFolder}/src",
       "skipFiles": ["<node_internals>/**"],

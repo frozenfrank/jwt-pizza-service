@@ -29,9 +29,9 @@ class UserMetricsTracker extends MetricsTracker {
   /* override */ flush() {
     super.flush();
     const usersMetrics /*: UserMetrics */ = {
-      active_hour: this.activeUsers_hour.size(),
-      active_day: this.activeUsers_day.size(),
-      active_week: this.activeUsers_week.size(),
+      active_hour: this.activeUsers_hour.size,
+      active_day: this.activeUsers_day.size,
+      active_week: this.activeUsers_week.size,
     };
     this.generator.bufferMetric(this.prefix, usersMetrics);
 
