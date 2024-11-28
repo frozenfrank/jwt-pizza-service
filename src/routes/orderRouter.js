@@ -90,11 +90,17 @@ orderRouter.post(
       }));
     const j = await r.json();
     if (r.ok) {
+      metrics.logSaleSuccessful(getOrderTotal(r.order));
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
     } else {
+      metrics.logSaleFailure();
       res.status(500).send({ message: 'Failed to fulfill order at factory', reportUrl: j.reportUrl });
     }
   })
 );
+
+function getOrderTotal(order) {
+  return order?.items.reduce((total, item) => total + (item.price || 0), 0) || 0;
+}
 
 module.exports = orderRouter;
