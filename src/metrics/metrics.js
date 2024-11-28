@@ -102,8 +102,9 @@ class Metrics {
       .then((response) => {
         if (!response.ok) {
           if (this.VERBOSE >= 1) console.error('Failed to push metrics data to Grafana');
+          if (this.VERBOSE >= 2) console.warn(promString);
         } else {
-          if (this.VERBOSE >= 4) console.log(`Pushed ${promString.replaceAll("\n", "\n  ")}`);
+          if (this.VERBOSE >= 4) console.log(`Pushed stats:\n  ${promString.replaceAll("\n", "\n  ")}`);
         }
       })
       .catch((error) => {
