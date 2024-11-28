@@ -1,6 +1,7 @@
 const MetricsTracker = require("./tracker.js");
 
 class LatencyMetricsTracker extends MetricsTracker {
+  _loggedMetricNames = new Set();
 
   constructor(generator) {
     super("lat", generator);
@@ -22,7 +23,13 @@ class LatencyMetricsTracker extends MetricsTracker {
 
   logLatency(metricName, start, end = new Date) {
     const latency = (end - start);
-    this._bufferMetrics({[metricName]: latency});
+    this._loggedMetricNames.add(metricName);
+    this.metrics[metricName] = Math.max(this.metrics[metricName], latency) || latency;
+  }
+
+  /* override */ flush() {
+    super.flush();
+    this._loggedMetricNames.forEach(metricName => this.metrics[metricName] = 0);
   }
 }
 
