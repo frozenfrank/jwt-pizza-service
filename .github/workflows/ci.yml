@@ -58,14 +58,14 @@ jobs:
               listPerPage: 10,
             },
             factory: {
-              url: 'https://pizza-factory.cs329.click',
+              url: '${{ vars.FACTORY_URL }}',
               apiKey: '${{ secrets.FACTORY_API_KEY }}',
             },
             metrics: {
-              source: "${{ vars.GRAFANA_METRIC_SOURCE }}",
-              userId: ${{ secrets.GRAFANA_ACCOUNT }},
-              url: "${{ secrets.METRICS_URL }}",
-              apiKey: "${{ secrets.GRAFANA_TOKEN }}"
+              source: '${{ vars.METRICS_SOURCE }}',
+              userId: '${{ secrets.METRICS_USER_ID }}',
+              url: '${{ secrets.METRICS_URL }}',
+              apiKey: '${{ secrets.METRICS_API_KEY }}'
             },
           };" > src/config.js
 

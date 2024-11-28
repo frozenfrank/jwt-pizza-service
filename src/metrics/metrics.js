@@ -19,7 +19,7 @@ class Metrics {
    * * **LOG** = 3
    * * **VERBOSE** = 4
    */
-  VERBOSE = 3;
+  VERBOSE = 2;
 
   constructor() {
     const generator = new MetricGenerator(config.source);
