@@ -12,6 +12,13 @@ class Metrics {
   // private trackers: Record<String, MetricsTracker>;
   // private trackersList: MetricsTracker[];
   // private periodicTimer: NodeJS.Timeout;
+  /** Higher levels of verbosity logs more things to the console.
+   * * **SILENT** = 0
+   * * **ERRORS** = 1
+   * * **WARN** = 2
+   * * **LOG** = 3
+   */
+  VERBOSE = 1;
 
   constructor() {
     const generator = new MetricGenerator(config.source);
@@ -36,7 +43,7 @@ class Metrics {
     this.trackers.Http.incrementRequests(req.method);
     this.trackers.User.trackActiveUser(req.user?.id)
     res.on('finish', () => {
-      console.log(`Request: ${req.method.padEnd(8)} Status: ${res.statusCode} URL: ${req.originalUrl}`);
+      if (this.VERBOSE >= 3) console.log(`Request: ${req.method.padEnd(8)} Status: ${res.statusCode} URL: ${req.originalUrl}`);
       this.trackers.Http.incrementResults(res.statusCode);
     });
     this.trackers.Latency.logLatency("service", () => next());
@@ -90,14 +97,14 @@ class Metrics {
     })
       .then((response) => {
         if (!response.ok) {
-          console.error('Failed to push metrics data to Grafana');
+          if (this.VERBOSE >= 1) console.error('Failed to push metrics data to Grafana');
         } else {
-          console.log(`Pushed ${promString.replaceAll("\n", "\n  ")}`);
+          if (this.VERBOSE >= 3) console.log(`Pushed ${promString.replaceAll("\n", "\n  ")}`);
         }
       })
       .catch((error) => {
-        console.error('Error pushing metrics:', error);
-        console.warn(`Dropped metrics due to error: ${promString}`);
+        if (this.VERBOSE >= 1) console.error('Error pushing metrics:', error);
+        if (this.VERBOSE >= 2) console.warn(`Dropped metrics due to error: ${promString}`);
       });
   }
 }
