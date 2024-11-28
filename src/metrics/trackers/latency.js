@@ -17,7 +17,7 @@ class LatencyMetricsTracker extends MetricsTracker {
       throw error;
     } finally {
       const end = new Date();
-      const latency = (start - end);
+      const latency = (end - start);
       this._bufferMetrics({[metricName]: latency});
     }
   }
