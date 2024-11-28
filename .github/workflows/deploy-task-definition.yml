@@ -1,0 +1,26 @@
+# .github/workflows/reusable-workflow.yml
+name: Deploy Task Definition
+
+on:
+  workflow_call:
+  workflow_dispatch:
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Create OIDC token to AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.CI_IAM_ROLE }}
+
+      - name: Deploy new task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          service: ${{ vars.AWS_SERVICE_NAME }}
+          cluster: ${{ vars.AWS_CLUSTER_NAME }}
+          wait-for-service-stability: false
