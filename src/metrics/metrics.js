@@ -17,8 +17,9 @@ class Metrics {
    * * **ERRORS** = 1
    * * **WARN** = 2
    * * **LOG** = 3
+   * * **VERBOSE** = 4
    */
-  VERBOSE = 1;
+  VERBOSE = 3;
 
   constructor() {
     const generator = new MetricGenerator(config.source);
@@ -41,7 +42,7 @@ class Metrics {
 
   requestTracker(req, res, next) {
     this.trackers.Http.incrementRequests(req.method);
-    this.trackers.User.trackActiveUser(req.user?.id)
+    this.trackers.User.trackActiveUser(req.user?.id);
     res.on('finish', () => {
       if (this.VERBOSE >= 3) console.log(`Request: ${req.method.padEnd(8)} Status: ${res.statusCode} URL: ${req.originalUrl}`);
       this.trackers.Http.incrementResults(res.statusCode);
@@ -99,7 +100,7 @@ class Metrics {
         if (!response.ok) {
           if (this.VERBOSE >= 1) console.error('Failed to push metrics data to Grafana');
         } else {
-          if (this.VERBOSE >= 3) console.log(`Pushed ${promString.replaceAll("\n", "\n  ")}`);
+          if (this.VERBOSE >= 4) console.log(`Pushed ${promString.replaceAll("\n", "\n  ")}`);
         }
       })
       .catch((error) => {
