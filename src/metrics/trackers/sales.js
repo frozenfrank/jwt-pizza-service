@@ -2,7 +2,7 @@ const MetricsTracker = require("./tracker.js");
 
 class SalesMetricsTracker extends MetricsTracker {
   constructor(generator) {
-    super("sys", generator);
+    super("sales", generator);
     this.metrics.qty = 0;
     this.metrics.failed_requests = 0;
     this.metrics.revenue = 0;
