@@ -36,7 +36,7 @@ class Metrics {
     this.trackers.Http.incrementRequests(req.method);
     this.trackers.User.trackActiveUser(req.user?.id)
     res.on('finish', () => {
-      console.log(`Request: ${req.method} ${req.url} - Status: ${res.statusCode}`);
+      console.log(`Request: ${req.method.padEnd(8)} Status: ${res.statusCode} URL: ${req.originalUrl}`);
       this.trackers.Http.incrementResults(res.statusCode);
     });
     this.trackers.Latency.logLatency("service", () => next());
