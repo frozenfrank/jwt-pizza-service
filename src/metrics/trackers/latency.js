@@ -6,7 +6,7 @@ class LatencyMetricsTracker extends MetricsTracker {
     super("lat", generator);
   }
 
-  async logLatency(metricName, fn) {
+  async wrapLatency(metricName, fn) {
     const start = new Date();
     try {
       return await fn();
@@ -16,10 +16,13 @@ class LatencyMetricsTracker extends MetricsTracker {
       this.metrics[metricNameStr]++;
       throw error;
     } finally {
-      const end = new Date();
-      const latency = (end - start);
-      this._bufferMetrics({[metricName]: latency});
+      this.logLatency(metricName, start);
     }
+  }
+
+  logLatency(metricName, start, end = new Date) {
+    const latency = (end - start);
+    this._bufferMetrics({[metricName]: latency});
   }
 }
 

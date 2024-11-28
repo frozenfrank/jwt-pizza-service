@@ -43,11 +43,14 @@ class Metrics {
   requestTracker(req, res, next) {
     this.trackers.Http.incrementRequests(req.method);
     this.trackers.User.trackActiveUser(req.user?.id);
+    const start = new Date; // The next() function returns before the request is fully handled
     res.on('finish', () => {
-      if (this.VERBOSE >= 3) console.log(`Request: ${req.method.padEnd(8)} Status: ${res.statusCode} URL: ${req.originalUrl}`);
+      const end = new Date
+      if (this.VERBOSE >= 3) console.log(`Request: ${req.method.padEnd(8)} Status: ${res.statusCode} (${end-start}ms) URL: ${req.originalUrl}`);
+      this.trackers.Latency.logLatency("service", start, end);
       this.trackers.Http.incrementResults(res.statusCode);
     });
-    this.trackers.Latency.logLatency("service", () => next());
+    next();
   }
 
   logAuthAttempt(successful) {
@@ -63,7 +66,7 @@ class Metrics {
   }
 
   trackPizzaCreationLatency(fn) {
-    return this.trackers.Latency.logLatency("factory", fn);
+    return this.trackers.Latency.wrapLatency("factory", fn);
   }
 
   // Internal helpers
