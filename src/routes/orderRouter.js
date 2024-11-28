@@ -90,7 +90,7 @@ orderRouter.post(
       }));
     const j = await r.json();
     if (r.ok) {
-      metrics.logSaleSuccessful(getOrderTotal(r.order));
+      metrics.logSaleSuccessful(getOrderTotal(order));
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
     } else {
       metrics.logSaleFailure();
