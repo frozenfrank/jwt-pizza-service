@@ -61,6 +61,12 @@ jobs:
               url: 'https://pizza-factory.cs329.click',
               apiKey: '${{ secrets.FACTORY_API_KEY }}',
             },
+            metrics: {
+              source: "${{ vars.GRAFANA_METRIC_SOURCE }}",
+              userId: ${{ secrets.GRAFANA_ACCOUNT }},
+              url: "${{ secrets.METRICS_URL }}",
+              apiKey: "${{ secrets.GRAFANA_TOKEN }}"
+            },
           };" > src/config.js
 
       - name: Tests

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "cd src && node index.js",
     "populate:db": "./populate_db_values.sh",
-    "start:traffic": "./simulate_traffic.sh",
+    "traffic:local": "./simulate_traffic.sh localhost:3000",
+    "traffic:remote": "./simulate_traffic.sh https://pizza-service.wheatharvest.llc",
     "test": "jest",
     "lint": "eslint ."
   },

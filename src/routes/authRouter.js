@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('../config.js');
+const metrics = require('../metrics/metrics.js');
 const { asyncHandler } = require('../endpointHelper.js');
 const { DB, Role } = require('../database/database.js');
 
@@ -106,7 +107,16 @@ authRouter.put(
   '/',
   asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    const user = await DB.getUser(email, password);
+    let user;
+    try {
+      // NOTE: This would certainly be better done with some middleware monitoring,
+      // but I'm not familiar enough with the way it works to instrument it properly.
+      user = await DB.getUser(email, password);
+      metrics.logAuthAttempt(true);
+    } catch (error) {
+      metrics.logAuthAttempt(false);
+      throw error;
+    }
     const auth = await setAuth(user);
     res.json({ user: user, token: auth });
   })
