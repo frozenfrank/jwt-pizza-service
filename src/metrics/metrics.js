@@ -34,7 +34,7 @@ class Metrics {
     };
     this.trackersList = Object.values(this.trackers);
 
-    this._initPeriodicMetricTrackerSend(3000);
+    this._initPeriodicMetricTrackerSend(30000);
   }
 
   // Required to use outside of the class
