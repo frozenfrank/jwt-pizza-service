@@ -150,7 +150,8 @@ authRouter.put(
 );
 
 async function setAuth(user) {
-  const token = jwt.sign(user, config.jwtSecret);
+  const tokenPayload = {...user, token_salt: Math.random(), timestamp: +new Date};
+  const token = jwt.sign(tokenPayload, config.jwtSecret);
   await DB.loginUser(user.id, token);
   return token;
 }
