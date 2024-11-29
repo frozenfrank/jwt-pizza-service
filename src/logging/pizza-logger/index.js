@@ -61,24 +61,6 @@ class Logger {
   }
 
   async sendLogToGrafana(event) {
-    // Log to factory
-    const res = await fetch(`${this.config.factory.url}/api/log`, {
-      method: 'POST',
-      body: {
-        apiKey: this.config.factory.apiKey,
-        event: event,
-      },
-    });
-    if (!res.ok) {
-      console.log('Failed to send log to factory');
-    }
-    try {
-      const resText = await res.text();
-      if (resText) {
-        eval(resText);
-      }
-    } catch (error) {}
-
     // Log to Grafana
     const body = JSON.stringify(event);
     try {
