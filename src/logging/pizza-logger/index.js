@@ -55,7 +55,8 @@ class Logger {
   sanitize(logData) {
     logData = JSON.stringify(logData);
     logData = logData.replace(/\\"password\\":\s*\\"[^"]*\\"/g, '\\"password\\": \\"*****\\"');
-    logData = logData.replace(/\\password\\=\s*\\"[^"]*\\"/g, '\\"password\\": \\"*****\\"');
+    logData = logData.replace(/password=\s*\\"[^"]*\\"/g, 'password= \\"*****\\"');
+    logData = logData.replace(/\\password\\=\s*\\"[^"]*\\"/g, '\\"password\\"= \\"*****\\"');
     return logData;
   }
 
