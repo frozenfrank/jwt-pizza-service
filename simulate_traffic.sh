@@ -11,7 +11,7 @@ host=$1
 # Function to cleanly exit
 cleanup() {
   echo "Terminating background processes..."
-  kill $pid1 $pid2 $pid3 $pid4
+  kill $pid1 $pid2 $pid3 $pid4 $pid5
   exit 0
 }
 
@@ -60,6 +60,21 @@ while true; do
 done &
 pid4=$!
 
+# Simulate a diner attempting to create a menu item
+while true; do
+  sleep 2;
+  response=$(curl -s -X POST $host/api/auth -d '{"email":"d@jwt.com", "password":"diner"}' -H 'Content-Type: application/json');
+  token=$(echo $response | jq -r '.token');
+  echo "Login diner..."
+  curl -s -X POST $host/api/franchise -H "Authorization: Bearer $token" > /dev/null;
+  echo "Failed to create franchise"
+  sleep 3
+  curl -s -X DELETE $host/api/auth -H "Authorization: Bearer $token" > /dev/null;
+  echo "Logging out diner..."
+  sleep 10
+done &
+pid5=$!
+
 
 # Wait for the background processes to complete
-wait $pid1 $pid2 $pid3 $pid4
+wait $pid1 $pid2 $pid3 $pid4 $pid5
