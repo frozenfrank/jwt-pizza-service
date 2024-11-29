@@ -4,13 +4,16 @@ class Logger {
   }
 
   httpLogger = (req, res, next) => {
+    const start = new Date;
     let send = res.send;
     res.send = (resBody) => {
+      const end = new Date;
       const logData = {
         authorized: !!req.headers.authorization,
         path: req.originalUrl,
         ip: req.ip,
         method: req.method,
+        latency: end - start,
         statusCode: res.statusCode,
         reqBody: JSON.stringify(req.body),
         resBody: JSON.stringify(resBody),
