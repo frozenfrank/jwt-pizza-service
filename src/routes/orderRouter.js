@@ -93,6 +93,7 @@ orderRouter.post(
         body: JSON.stringify({ diner: { id: req.user.id, name: req.user.name, email: req.user.email }, order }),
       }));
     const j = await r.json();
+    logFactoryResponse(orderInfo, j);
     if (r.ok) {
       metrics.logSaleSuccessful(orderTotal);
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
@@ -102,6 +103,14 @@ orderRouter.post(
     }
   })
 );
+
+function logFactoryResponse(orderInfo, j) {
+  const noJWT = {...j, jwt: "*****"};
+  logger.factoryLogger({
+    orderId: orderInfo.orderId,
+    factory_rsp: noJWT,
+  });
+}
 
 function getOrderTotal(order) {
   return order?.items.reduce((total, item) => total + (item.price || 0), 0) || 0;
