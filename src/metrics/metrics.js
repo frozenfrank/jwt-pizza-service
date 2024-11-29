@@ -79,7 +79,7 @@ class Metrics {
       try {
         this._sendMetricTrackersToGrafana();
       } catch (error) {
-        console.log('Error sending metrics', error);
+        console.error('Error sending metrics', error);
       }
     }, period);
     this.periodicTimer.unref();
