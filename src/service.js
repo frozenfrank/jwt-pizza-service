@@ -1,5 +1,6 @@
 const express = require('express');
 const metrics = require('./metrics/metrics.js');
+const logger = require('./logging/logger.js');
 const { authRouter, setAuthUser } = require('./routes/authRouter.js');
 const orderRouter = require('./routes/orderRouter.js');
 const franchiseRouter = require('./routes/franchiseRouter.js');
@@ -17,6 +18,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(metrics.requestTracker.bind(metrics));
+app.use(logger.httpLogger.bind(logger));
 
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
