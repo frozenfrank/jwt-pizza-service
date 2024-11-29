@@ -4,12 +4,16 @@ class Logger {
   }
 
   httpLogger = (req, res, next) => {
+    const start = new Date;
     let send = res.send;
     res.send = (resBody) => {
+      const end = new Date;
       const logData = {
         authorized: !!req.headers.authorization,
         path: req.originalUrl,
+        ip: req.ip,
         method: req.method,
+        latency: end - start,
         statusCode: res.statusCode,
         reqBody: JSON.stringify(req.body),
         resBody: JSON.stringify(resBody),
@@ -73,12 +77,13 @@ class Logger {
         },
       });
       if (!res.ok) {
-        console.warn("Dropped result:", res);
-        console.log('Failed to send log to Grafana');
+        const logResult = { ...res, body: res.text() };
+        console.warn("Dropped result:", logResult);
+        console.error('Failed to send log to Grafana');
       }
     } catch (error) {
       console.warn("Dropped event:", event);
-      console.log('Error sending log to Grafana:', error);
+      console.error('Error sending log to Grafana:', error);
     }
   }
 }
