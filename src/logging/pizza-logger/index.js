@@ -73,9 +73,11 @@ class Logger {
         },
       });
       if (!res.ok) {
+        console.warn("Dropped result:", res);
         console.log('Failed to send log to Grafana');
       }
     } catch (error) {
+      console.warn("Dropped event:", event);
       console.log('Error sending log to Grafana:', error);
     }
   }
