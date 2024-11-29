@@ -31,6 +31,7 @@ export interface HttpMetrics {
 }
 
 export interface UserMetrics {
+  users_active_minute: InstantNumber;
   users_active_hour: InstantNumber;
   users_active_day: InstantNumber;
   users_active_week: InstantNumber;
