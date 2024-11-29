@@ -106,7 +106,7 @@ orderRouter.post(
 
 function logFactoryResponse(orderInfo, j) {
   const noJWT = {...j, jwt: "*****"};
-  logger.factoryLogger({
+  logger.log("info", "factory-resp", {
     orderId: orderInfo.orderId,
     factory_rsp: noJWT,
   });
