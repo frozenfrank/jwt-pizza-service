@@ -106,10 +106,11 @@ orderRouter.post(
 
 function logFactoryResponse(orderInfo, j) {
   const noJWT = {...j, jwt: "*****"};
-  logger.log("info", "factory-resp", {
-    orderId: orderInfo.orderId,
+  const log = {
+    orderId: orderInfo.order.id,
     factory_rsp: noJWT,
-  });
+  };
+  logger.log("info", "factory-resp", log);
 }
 
 function getOrderTotal(order) {
