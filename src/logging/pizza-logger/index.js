@@ -1,3 +1,5 @@
+const { readAuthToken } = require("../../routes/authHelper");
+
 class Logger {
   constructor(config) {
     this.config = config;
@@ -15,6 +17,7 @@ class Logger {
         method: req.method,
         latency: end - start,
         statusCode: res.statusCode,
+        sessionId: readAuthToken(req),
         reqBody: JSON.stringify(req.body),
         resBody: JSON.stringify(resBody),
       };
