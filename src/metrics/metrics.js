@@ -42,7 +42,7 @@ class Metrics {
 
   requestTracker(req, res, next) {
     this.trackers.Http.incrementRequests(req.method);
-    this.trackers.User.trackActiveUser(req.user?.id);
+    this.trackers.User.trackActiveId(req.user?.id);
     const start = new Date; // The next() function returns before the request is fully handled
     res.on('finish', () => {
       const end = new Date

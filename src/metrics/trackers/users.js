@@ -1,56 +1,62 @@
 const MetricsTracker = require("./tracker.js");
 
-class UserMetricsTracker extends MetricsTracker {
-  // private activeUsers_minute: Set;
-  // private activeUsers_hour: Set;
-  // private activeUsers_day: Set;
-  // private activeUsers_week: Set;
+class ActiveIdMetricsTracker extends MetricsTracker {
+  // private active_minute: Set;
+  // private active_hour: Set;
+  // private active_day: Set;
+  // private active_week: Set;
   // private lastFlush = new Date();
 
-  constructor(generator) {
-    super("users", generator);
+  constructor(prefix, generator) {
+    super(prefix, generator);
     this.metrics.unauthenticated_requests = 0;
 
-    this.activeUsers_minute = new Set();
-    this.activeUsers_hour = new Set();
-    this.activeUsers_day = new Set();
-    this.activeUsers_week = new Set();
+    this.active_minute = new Set();
+    this.active_hour = new Set();
+    this.active_day = new Set();
+    this.active_week = new Set();
     this.lastFlush = new Date();
   }
 
-  trackActiveUser(userIdentifier) {
-    if (!userIdentifier) {
+  trackActiveId(id) {
+    if (!id) {
       this.metrics.unauthenticated_requests++;
       return;
     }
-    this.activeUsers_minute.add(userIdentifier);
-    this.activeUsers_hour.add(userIdentifier);
-    this.activeUsers_day.add(userIdentifier);
-    this.activeUsers_week.add(userIdentifier);
+    this.active_minute.add(id);
+    this.active_hour.add(id);
+    this.active_day.add(id);
+    this.active_week.add(id);
   }
 
   /* override */ flush() {
-    this.metrics.active_minute = this.activeUsers_minute.size;
-    this.metrics.active_hour = this.activeUsers_hour.size;
-    this.metrics.active_day = this.activeUsers_day.size;
-    this.metrics.active_week = this.activeUsers_week.size;
+    this.metrics.active_minute = this.active_minute.size;
+    this.metrics.active_hour = this.active_hour.size;
+    this.metrics.active_day = this.active_day.size;
+    this.metrics.active_week = this.active_week.size;
     super.flush();
 
     // Reset the sets according to their schedules
     const now = new Date;
     if (now.getMinutes() != this.lastFlush.getMinutes()) {
-      this.activeUsers_minute.clear();
+      this.active_minute.clear();
       if (now.getHours() != this.lastFlush.getHours()) {
-        this.activeUsers_hour.clear();
+        this.active_hour.clear();
         if (now.getDate() != this.lastFlush.getDate()) {
-          this.activeUsers_day.clear();
+          this.active_day.clear();
           if (now.getDay() === 0) { // Reset the week set at the beginning of Sunday morning (just after midnight)
-            this.activeUsers_week.clear();
+            this.active_week.clear();
           }
         }
       }
       this.lastFlush = now;
     }
+  }
+}
+
+class UserMetricsTracker extends ActiveIdMetricsTracker {
+  constructor(generator) {
+    super("users", generator);
   }
 }
 
