@@ -1,11 +1,12 @@
 const config = require('../config.js').metrics;
+const {readAuthToken} = require('../routes/authRouter.js');
 const MetricGenerator = require('./generator.js');
 const AuthMetricsTracker = require('./trackers/auth.js');
 const HttpMetricsTracker = require('./trackers/http.js');
 const LatencyMetricsTracker = require('./trackers/latency.js');
 const SalesMetricsTracker = require('./trackers/sales.js');
 const SystemMetricsTracker = require('./trackers/system.js');
-const UserMetricsTracker = require('./trackers/users.js');
+const {UserMetricsTracker, SessionMetricsTracker} = require('./trackers/users.js');
 
 class Metrics {
   // private generator: MetricGenerator;
@@ -27,6 +28,7 @@ class Metrics {
     this.trackers = {
       Http: new HttpMetricsTracker(generator),
       User: new UserMetricsTracker(generator),
+      Session: new SessionMetricsTracker(generator),
       Auth: new AuthMetricsTracker(generator),
       System: new SystemMetricsTracker(generator),
       Sales: new SalesMetricsTracker(generator),
@@ -42,10 +44,11 @@ class Metrics {
 
   requestTracker(req, res, next) {
     this.trackers.Http.incrementRequests(req.method);
+    this.trackers.Session.trackActiveId(readAuthToken(req));
     this.trackers.User.trackActiveId(req.user?.id);
     const start = new Date; // The next() function returns before the request is fully handled
     res.on('finish', () => {
-      const end = new Date
+      const end = new Date;
       if (this.VERBOSE >= 3) console.log(`Request: ${req.method.padEnd(8)} Status: ${res.statusCode} (${end-start}ms) URL: ${req.originalUrl}`);
       this.trackers.Latency.logLatency("service", start, end);
       this.trackers.Http.incrementResults(res.statusCode);

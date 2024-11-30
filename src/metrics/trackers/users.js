@@ -60,4 +60,10 @@ class UserMetricsTracker extends ActiveIdMetricsTracker {
   }
 }
 
-module.exports = UserMetricsTracker;
+class SessionMetricsTracker extends ActiveIdMetricsTracker {
+  constructor(generator) {
+    super("sessions", generator);
+  }
+}
+
+module.exports = {UserMetricsTracker, SessionMetricsTracker};
