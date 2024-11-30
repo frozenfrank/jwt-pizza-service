@@ -84,7 +84,8 @@ authRouter.put(
       return res.status(404).send({ message: 'unauthorized' });
     }
 
-    enableChaos = req.params.state === 'true';
+    const requestedState = ("" + req.params.state).toLowerCase();
+    enableChaos = requestedState === 'true';
     res.json({ chaos: enableChaos });
   })
 );
