@@ -8,6 +8,8 @@
     "populate:db": "./populate_db_values.sh",
     "traffic:local": "./simulate_traffic.sh localhost:3000",
     "traffic:remote": "./simulate_traffic.sh https://pizza-service.wheatharvest.llc",
+    "chaos:local": "./set_chaos_state.sh localhost:3000",
+    "chaos:remote": "./set_chaos_state.sh https://pizza-service.wheatharvest.llc",
     "test": "jest",
     "lint": "eslint ."
   },
