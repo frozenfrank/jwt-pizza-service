@@ -6,6 +6,11 @@ Backend service for making JWT pizzas. This service tracks users and franchises 
 
 JWTs are used for authentication objects.
 
+## Observability
+
+A Grafana dashboard is set up monitor this system. The internal dashboard leverages _Ad Hoc Queries_ to show just results from either the DEV or PRODUCTION environment at a time.
+ - [Internal Dashboard](https://frozenfrank.grafana.net/d/fe59vb10qlmo0c/pizza-dashboard?)
+
 ## Deployment
 
 In order for the server to work correctly it must be configured by providing a `config.js` file.
@@ -50,4 +55,15 @@ Nodemon is assumed to be installed globally so that you can have hot reloading w
 
 ```sh
 npm -g install nodemon
+```
+
+## Chaos Testing
+
+A chaos state is embedded, and some endpoints are set up to fail whenever [chaos](https://github.com/devops329/devops/blob/main/instruction/chaosTesting/chaosTesting.md) is enabled.
+
+Use the following to enable or disable chaos for a testing or production server:
+
+```shell
+npm run chaos:local ADMIN_USER ADMIN_PASS TRUE/FALSE
+npm run chaos:remote ADMIN_USER ADMIN_PASS TRUE/FALSE
 ```
