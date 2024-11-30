@@ -69,24 +69,31 @@ class Logger {
 
   async sendLogToGrafana(event) {
     // Log to Grafana
-    const body = JSON.stringify(event);
+    const eventStr = JSON.stringify(event);
+    let success = false;
     try {
       const res = await fetch(`${this.config.logging.url}`, {
         method: 'post',
-        body: body,
+        body: eventStr,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.config.logging.userId}:${this.config.logging.apiKey}`,
         },
       });
       if (!res.ok) {
-        const logResult = { ...res, body: res.text() };
-        console.warn("Dropped result:", logResult);
-        console.error('Failed to send log to Grafana');
+        console.error('Failed to send log to Grafana. Result body:');
+        const resultBody = await res.text();
+        console.error({ ...res, body: resultBody });
+      } else {
+        success = true;
       }
     } catch (error) {
-      console.warn("Dropped event:", event);
-      console.error('Error sending log to Grafana:', error);
+      console.error('Error sending log to Grafana:');
+      console.error(error);
+    } finally {
+      if (!success) {
+        console.warn("Dropped event:", eventStr);
+      }
     }
   }
 }
