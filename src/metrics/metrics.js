@@ -1,5 +1,5 @@
 const config = require('../config.js').metrics;
-const {readAuthToken} = require('../routes/authRouter.js');
+const {readAuthToken} = require('../routes/authHelper.js');
 const MetricGenerator = require('./generator.js');
 const AuthMetricsTracker = require('./trackers/auth.js');
 const HttpMetricsTracker = require('./trackers/http.js');
