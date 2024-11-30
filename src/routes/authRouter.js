@@ -4,6 +4,7 @@ const config = require('../config.js');
 const metrics = require('../metrics/metrics.js');
 const { asyncHandler } = require('../endpointHelper.js');
 const { DB, Role } = require('../database/database.js');
+const { readAuthToken } = require('./authHelper.js');
 
 const authRouter = express.Router();
 
@@ -162,13 +163,4 @@ async function clearAuth(req) {
     await DB.logoutUser(token);
   }
 }
-
-function readAuthToken(req) {
-  const authHeader = req.headers.authorization;
-  if (authHeader) {
-    return authHeader.split(' ')[1];
-  }
-  return null;
-}
-
 module.exports = { authRouter, setAuthUser };

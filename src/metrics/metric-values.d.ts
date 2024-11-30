@@ -5,6 +5,7 @@ export type InstantNumber = number;
 export type PizzaServiceMetrics =
   HttpMetrics &
   UserMetrics &
+  SessionMetrics &
   AuthMetrics &
   SystemMetrics &
   SalesMetrics &
@@ -30,12 +31,18 @@ export interface HttpMetrics {
   http_results_error: AccumulatorNumber;
 }
 
-export interface UserMetrics {
-  users_active_minute: InstantNumber;
-  users_active_hour: InstantNumber;
-  users_active_day: InstantNumber;
-  users_active_week: InstantNumber;
-  users_unauthenticated_requests: AccumulatorNumber;
+export type UserMetrics = ActiveIdMetricsMapper<"users">;
+export type SessionMetrics = ActiveIdMetricsMapper<"sessions">;
+
+type ActiveIdMetricsMapper<PREFIX extends string> = {
+  [K in keyof ActiveIdMetrics as `${PREFIX}_${K}`]: ActiveIdMetrics[K];
+}
+interface ActiveIdMetrics {
+  active_minute: InstantNumber;
+  active_hour: InstantNumber;
+  active_day: InstantNumber;
+  active_week: InstantNumber;
+  unauthenticated_requests: AccumulatorNumber;
 }
 
 export interface AuthMetrics {
