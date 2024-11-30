@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Check if host is provided as a command line argument
-if [ -z "$1" ]; then
+if [[ -z "$1" ]]; then
   echo "Usage: $0 <host>"
   echo "Example: $0 http://localhost:3000"
   exit 1
