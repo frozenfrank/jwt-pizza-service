@@ -6,6 +6,11 @@ Backend service for making JWT pizzas. This service tracks users and franchises 
 
 JWTs are used for authentication objects.
 
+## Observability
+
+A Grafana dashboard is set up monitor this system. The internal dashboard leverages _Ad Hoc Queries_ to show just results from either the DEV or PRODUCTION environment at a time.
+ - [Internal Dashboard](https://frozenfrank.grafana.net/d/fe59vb10qlmo0c/pizza-dashboard?)
+
 ## Deployment
 
 In order for the server to work correctly it must be configured by providing a `config.js` file.
