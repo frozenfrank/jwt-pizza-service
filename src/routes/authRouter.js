@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('../config.js');
 const metrics = require('../metrics/metrics.js');
+const logger = require('../logging/logger.js');
 const { asyncHandler } = require('../endpointHelper.js');
 const { DB, Role } = require('../database/database.js');
 const { readAuthToken } = require('./authHelper.js');
@@ -106,6 +107,8 @@ authRouter.post(
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'name, email, and password are required' });
     }
+    await validateNewEmail(email);
+
     const user = await DB.addUser({ name, email, password, roles: [{ role: Role.Diner }] });
     const auth = await setAuth(user);
     res.json({ user: user, token: auth });
@@ -154,6 +157,8 @@ authRouter.put(
       return res.status(403).json({ message: 'unauthorized' });
     }
 
+    await validateNewEmail(email);
+
     const updatedUser = await DB.updateUser(userId, email, password, name);
     res.json(updatedUser);
   })
@@ -170,6 +175,21 @@ async function clearAuth(req) {
   const token = readAuthToken(req);
   if (token) {
     await DB.logoutUser(token);
+  }
+}
+
+async function validateNewEmail(email) /*: Promise<void|never> */ {
+  if (!email) {
+    return;
+  }
+
+  const usersWithEmail = await DB.usersWithEmail(email);
+  if (usersWithEmail.length) {
+    logger.log('warn', 'validate-unq-emails', usersWithEmail);
+    throw new Error("Validation error."); // Intentionally ambiguous to attempt to protect list of valid emails
+  } else {
+    logger.log('info', 'validate-unq-emails', usersWithEmail);
+    // Validated
   }
 }
 

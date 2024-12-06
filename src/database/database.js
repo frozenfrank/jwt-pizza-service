@@ -60,7 +60,7 @@ class DB {
   async getUser(email, password) {
     const connection = await this.getConnection();
     try {
-      const userResult = await this.query(connection, `SELECT * FROM user WHERE email=?`, [email]);
+      const userResult = await this.getRawUsersByEmail(email);
       const user = userResult[0];
       if (!user || !(await bcrypt.compare(password, user.password))) {
         throw new StatusCodeError('unknown user', 404);
@@ -74,6 +74,21 @@ class DB {
       return { ...user, roles: roles, password: undefined };
     } finally {
       connection.end();
+    }
+  }
+
+  async getRawUsersByEmail(email, reuseConnection = undefined) {
+    let connection = reuseConnection;
+    if (!connection) {
+      connection = await this.getConnection();
+    }
+
+    try {
+      return this.query(connection, `SELECT * FROM user WHERE email=?`, [email]);
+    } finally {
+      if (!reuseConnection) {
+        connection.end();
+      }
     }
   }
 
