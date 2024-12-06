@@ -77,7 +77,11 @@ class DB {
     }
   }
 
-  async updateUser(userId, email, password) {
+  async updateUser(userId, email, password, name) {
+    if (!userId) {
+      throw new Error("Cannot update user without a userId");
+    }
+
     const connection = await this.getConnection();
     try {
       const params = [];
@@ -88,6 +92,10 @@ class DB {
       if (email) {
         params.push(`email='${email}'`);
       }
+      if (name) {
+        params.push(`name='${name}'`);
+      }
+
       if (params.length > 0) {
         const query = `UPDATE user SET ${params.join(', ')} WHERE id=${userId}`;
         await this.query(connection, query);

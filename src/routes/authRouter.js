@@ -28,7 +28,7 @@ authRouter.endpoints = [
     path: '/api/auth/:userId',
     requiresAuth: true,
     description: 'Update user',
-    example: `curl -X PUT localhost:3000/api/auth/1 -d '{"email":"a@jwt.com", "password":"admin"}' -H 'Content-Type: application/json' -H 'Authorization: Bearer tttttt'`,
+    example: `curl -X PUT localhost:3000/api/auth/1 -d '{"email":"a@jwt.com", "password":"admin", name: "Admin"}' -H 'Content-Type: application/json' -H 'Authorization: Bearer tttttt'`,
     response: { id: 1, name: '常用名字', email: 'a@jwt.com', roles: [{ role: 'admin' }] },
   },
   {
@@ -147,14 +147,14 @@ authRouter.put(
   '/:userId',
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
     const userId = Number(req.params.userId);
     const user = req.user;
     if (user.id !== userId && !user.isRole(Role.Admin)) {
       return res.status(403).json({ message: 'unauthorized' });
     }
 
-    const updatedUser = await DB.updateUser(userId, email, password);
+    const updatedUser = await DB.updateUser(userId, email, password, name);
     res.json(updatedUser);
   })
 );
@@ -172,4 +172,5 @@ async function clearAuth(req) {
     await DB.logoutUser(token);
   }
 }
+
 module.exports = { authRouter, setAuthUser };
