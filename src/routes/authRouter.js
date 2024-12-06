@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('../config.js');
 const metrics = require('../metrics/metrics.js');
+const logger = require('../logging/logger.js');
 const { asyncHandler } = require('../endpointHelper.js');
 const { DB, Role } = require('../database/database.js');
 const { readAuthToken } = require('./authHelper.js');
@@ -28,7 +29,7 @@ authRouter.endpoints = [
     path: '/api/auth/:userId',
     requiresAuth: true,
     description: 'Update user',
-    example: `curl -X PUT localhost:3000/api/auth/1 -d '{"email":"a@jwt.com", "password":"admin"}' -H 'Content-Type: application/json' -H 'Authorization: Bearer tttttt'`,
+    example: `curl -X PUT localhost:3000/api/auth/1 -d '{"email":"a@jwt.com", "password":"admin", name: "Admin"}' -H 'Content-Type: application/json' -H 'Authorization: Bearer tttttt'`,
     response: { id: 1, name: '常用名字', email: 'a@jwt.com', roles: [{ role: 'admin' }] },
   },
   {
@@ -106,6 +107,8 @@ authRouter.post(
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'name, email, and password are required' });
     }
+    await validateNewEmail(email);
+
     const user = await DB.addUser({ name, email, password, roles: [{ role: Role.Diner }] });
     const auth = await setAuth(user);
     res.json({ user: user, token: auth });
@@ -147,14 +150,16 @@ authRouter.put(
   '/:userId',
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
     const userId = Number(req.params.userId);
     const user = req.user;
     if (user.id !== userId && !user.isRole(Role.Admin)) {
       return res.status(403).json({ message: 'unauthorized' });
     }
 
-    const updatedUser = await DB.updateUser(userId, email, password);
+    await validateNewEmail(email);
+
+    const updatedUser = await DB.updateUser(userId, email, password, name);
     res.json(updatedUser);
   })
 );
@@ -172,4 +177,20 @@ async function clearAuth(req) {
     await DB.logoutUser(token);
   }
 }
+
+async function validateNewEmail(email) /*: Promise<void|never> */ {
+  if (!email) {
+    return;
+  }
+
+  const usersWithEmail = await DB.usersWithEmail(email);
+  if (usersWithEmail.length) {
+    logger.log('warn', 'validate-unq-emails', usersWithEmail);
+    throw new Error("Validation error."); // Intentionally ambiguous to attempt to protect list of valid emails
+  } else {
+    logger.log('info', 'validate-unq-emails', usersWithEmail);
+    // Validated
+  }
+}
+
 module.exports = { authRouter, setAuthUser };

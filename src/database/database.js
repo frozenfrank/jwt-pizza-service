@@ -60,7 +60,7 @@ class DB {
   async getUser(email, password) {
     const connection = await this.getConnection();
     try {
-      const userResult = await this.query(connection, `SELECT * FROM user WHERE email=?`, [email]);
+      const userResult = await this.getRawUsersByEmail(email);
       const user = userResult[0];
       if (!user || !(await bcrypt.compare(password, user.password))) {
         throw new StatusCodeError('unknown user', 404);
@@ -77,7 +77,26 @@ class DB {
     }
   }
 
-  async updateUser(userId, email, password) {
+  async getRawUsersByEmail(email, reuseConnection = undefined) {
+    let connection = reuseConnection;
+    if (!connection) {
+      connection = await this.getConnection();
+    }
+
+    try {
+      return this.query(connection, `SELECT * FROM user WHERE email=?`, [email]);
+    } finally {
+      if (!reuseConnection) {
+        connection.end();
+      }
+    }
+  }
+
+  async updateUser(userId, email, password, name) {
+    if (!userId) {
+      throw new Error("Cannot update user without a userId");
+    }
+
     const connection = await this.getConnection();
     try {
       const params = [];
@@ -88,6 +107,10 @@ class DB {
       if (email) {
         params.push(`email='${email}'`);
       }
+      if (name) {
+        params.push(`name='${name}'`);
+      }
+
       if (params.length > 0) {
         const query = `UPDATE user SET ${params.join(', ')} WHERE id=${userId}`;
         await this.query(connection, query);

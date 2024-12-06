@@ -141,7 +141,7 @@ franchiseRouter.delete(
 );
 
 function franchiseExists(franchise) {
-  return franchise?.admins.length > 0;
+  return franchise?.admins.length > 0 || franchise?.stores.length > 0;
 }
 
 module.exports = franchiseRouter;
