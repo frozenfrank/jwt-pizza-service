@@ -81,9 +81,15 @@ orderRouter.post(
   '/',
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
+    // Always log the order so we have records
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
+
+    // Validate the order
+    await validateOrder(orderReq);
     const orderTotal = getOrderTotal(order);
+
+    // Send the order to the factory
     const orderInfo = { diner: { id: req.user.id, name: req.user.name, email: req.user.email }, orderTotal, order };
     logger.factoryLogger(orderInfo);
     const r = await metrics.trackPizzaCreationLatency(
@@ -94,6 +100,7 @@ orderRouter.post(
       }));
     const j = await r.json();
     logFactoryResponse(orderInfo, j);
+
     if (r.ok) {
       metrics.logSaleSuccessful(orderTotal);
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
@@ -103,6 +110,17 @@ orderRouter.post(
     }
   })
 );
+
+async function validateOrder(order) /* : Promise<void|never> */ {
+  if (!order) {
+    throw new Error("Empty or falsy order object.");
+  }
+
+  // No refund policy
+  if (order.items.some(i => i.price < 0)) {
+    throw new Error("No refund policy for JWT Pizzas.");
+  }
+}
 
 function logFactoryResponse(orderInfo, j) {
   const noJWT = {...j, jwt: "*****"};
