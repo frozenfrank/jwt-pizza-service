@@ -120,6 +120,23 @@ async function validateOrder(order) /* : Promise<void|never> */ {
   if (order.items.some(i => i.price < 0)) {
     throw new Error("No refund policy for JWT Pizzas.");
   }
+
+  const menuPrices = await getMenuItemPrices();
+  if (order.items.some(i => menuPrices[i.id] === undefined || menuPrices[i.id] !== i.price)) {
+    throw new Error("Price validation error.");
+  }
+}
+
+/** Returns all valid prices for an menu item by ID. Each item can have at most one price. */
+async function getMenuItemPrices() /* : Promise<Record<number, number>> */ {
+  const menu = await DB.getMenu();
+  const prices = {};
+
+  for (const item of menu) {
+    prices[item.id] = item.price;
+  }
+
+  return prices;
 }
 
 function logFactoryResponse(orderInfo, j) {
