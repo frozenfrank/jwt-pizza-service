@@ -183,7 +183,7 @@ async function validateNewEmail(email) /*: Promise<void|never> */ {
     return;
   }
 
-  const usersWithEmail = await DB.usersWithEmail(email);
+  const usersWithEmail = await DB.getRawUsersByEmail(email);
   if (usersWithEmail.length) {
     logger.log('warn', 'validate-unq-emails', usersWithEmail);
     throw new Error("Validation error."); // Intentionally ambiguous to attempt to protect list of valid emails
