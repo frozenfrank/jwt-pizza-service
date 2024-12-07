@@ -122,7 +122,7 @@ async function validateOrder(order) /* : Promise<void|never> */ {
   }
 
   const menuPrices = await getMenuItemPrices();
-  if (order.items.some(i => menuPrices[i.id] === undefined || menuPrices[i.id] !== i.price)) {
+  if (order.items.some(i => menuPrices[i.menuId] === undefined || menuPrices[i.menuId] !== i.price)) {
     throw new Error("Price validation error.");
   }
 }
