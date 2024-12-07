@@ -45,7 +45,7 @@ authRouter.endpoints = [
     path: '/api/auth/chaos/:state',
     requiresAuth: true,
     description: 'Set chaos state of service',
-    example: `curl -X PUR localhost:3000/api/auth/chaos/true -H 'Authorization: Bearer tttttt'`,
+    example: `curl -X PUT localhost:3000/api/auth/chaos/true -H 'Authorization: Bearer tttttt'`,
     response: { chaos: 'true' },
   },
 ];
