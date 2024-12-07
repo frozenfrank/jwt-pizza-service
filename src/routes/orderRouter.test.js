@@ -62,6 +62,32 @@ test('submit successful order', async () => {
   expectSuccessfulResponse(response);
 });
 
+test('submit discounted order', async () => {
+  const order = {
+    franchiseId: 1,
+    storeId: 1,
+    items: [
+      { menuId: 1, description: "Cheap pizza", price: 0.00000 },
+    ],
+  };
+
+  const response = await sendRequest(r => r.post(API_ROOT), true).send(order);
+  expectUnauthorizedResponse(response, 500, "validation");
+});
+
+test('submit refund order', async () => {
+  const order = {
+    franchiseId: 1,
+    storeId: 1,
+    items: [
+      { menuId: 1, description: "Refunded pizza", price: -0.035 },
+    ]
+  };
+
+  const response = await sendRequest(r => r.post(API_ROOT), true).send(order);
+  expectUnauthorizedResponse(response, 500, "refund");
+});
+
 async function getMenu() {
   const response = await sendRequest(r => r.get(API_ROOT + "menu", false)).send();
   expectSuccessfulResponse(response);
