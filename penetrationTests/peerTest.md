@@ -1,7 +1,5 @@
 # Penetration Peer Testing
 
-**Team:** James Finlinson, Stephen Morgan
-
 ## Participants
 
 Partner 1:
@@ -20,14 +18,15 @@ I anticipated and protected myself against the following security attacks:
 
 | Attack Type | Potential<br>Severity | Description | Commits |
 | ----------- | ------------------ | ------ | ---- |
-| Security Misconfiguration | High | Change password for each of the following default, privileged users: a@jwt.com, f@jwt.com. |
-| Vulnerable Components | High | Review and remove code-injecting 3rd party dependency. | d7bc8f983915d8d6391cd189ba7231ab923867ad |
-| Authentication Failure | Medium | AuthTokens used to be deterministic by the incoming request. This could have allowed
+| Security Misconfiguration | **High** | Change password for each of the following default, privileged users: a@jwt.com, f@jwt.com. | Issue #9 |
+| Vulnerable Components | **High** | Review and remove code-injecting 3rd party dependency. | d7bc8f9 |
+| Authentication Failure | **Low** | AuthTokens used to be deterministic by the incoming request. This did allow requests to bypass extant-franchise requirements. There was low actual impact of this because no valuable targets were exposed by this vulnerability. | f322e8d, af7f566 |
+| Insecure Design | **Medium** | Order processing did not validate menu prices and allow cheaper or negatively priced pizzas. This would have impacted profits for a business. | b1ed785, 407c845 |
+| Software Integrity Failures | **Low** | `npm` reported multiple times that my dependencies had vulnerabilities. I ran the update scripts to upgrade properly. | ee912a2 |
 
 ### Stephen Morgan
 
-### Finding 1
-
+#### Finding 1
 
 | Item | Details |
 |------|---------|
@@ -40,7 +39,7 @@ I anticipated and protected myself against the following security attacks:
 | Corrections | Added sanitization to Database.js to avoid injection attacks |
 
 
-### Finding 2
+#### Finding 2
 
 | Item | Details |
 |------|---------|
