@@ -25,11 +25,8 @@ test('get menu', async () => {
   ]);
 
   // Get menu
-  const menuRes = await sendRequest(r => r.get(API_ROOT+"menu", false)).send();
-  expectSuccessfulResponse(menuRes);
-
-  // Assert all added items
-  const menuItemIds = menuRes.body.map(i => i.id);
+  const menu = await getMenu();
+  const menuItemIds = menu.map(i => i.id);
   for (const item of items) {
     expect(menuItemIds).toContain(item.id);
   }
@@ -42,6 +39,34 @@ test('add menu item non-admin', async () => {
   const addMenuRes = await sendRequest(r => r.put(API_ROOT+"menu"), true, false).send(newItem);
   expectUnauthorizedResponse(addMenuRes, 403, null);
 });
+
+test('submit successful order', async () => {
+  const menu = await getMenu();
+
+  const NUM_ITEMS_IN_ORDER = 5;
+  const order = {
+    "franchiseId": 1,
+    "storeId": 1,
+    "items": []
+  };
+  for (let i = 0; i < NUM_ITEMS_IN_ORDER; ++i) {
+    const menuItem = menu[i % menu.length]
+    order.items.push({
+      menuId: menuItem.id,
+      description: menuItem.title,
+      price: menuItem.price,
+    });
+  }
+
+  const response = await sendRequest(r => r.post(API_ROOT), true).send(order);
+  expectSuccessfulResponse(response);
+});
+
+async function getMenu() {
+  const response = await sendRequest(r => r.get(API_ROOT + "menu", false)).send();
+  expectSuccessfulResponse(response);
+  return response.body;
+}
 
 async function addMenuItem() {
   const newItem = {title: randomName(), description: "Lame item description", image: randomName() + ".png", price: randomInt(1, 10000)/100};

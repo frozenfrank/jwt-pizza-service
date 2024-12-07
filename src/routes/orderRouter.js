@@ -112,8 +112,12 @@ orderRouter.post(
 );
 
 async function validateOrder(order) /* : Promise<void|never> */ {
+  // Only meaningful orders policy
   if (!order) {
     throw new Error("Empty or falsy order object.");
+  }
+  if (!order.items?.length) {
+    throw new Error("No items requested in order.");
   }
 
   // No refund policy
@@ -121,6 +125,7 @@ async function validateOrder(order) /* : Promise<void|never> */ {
     throw new Error("No refund policy for JWT Pizzas.");
   }
 
+  // No discount policy
   const menuPrices = await getMenuItemPrices();
   if (order.items.some(i => menuPrices[i.menuId] === undefined || menuPrices[i.menuId] !== i.price)) {
     throw new Error("Price validation error.");
