@@ -90,7 +90,12 @@ orderRouter.post(
     const orderTotal = getOrderTotal(order);
 
     // Send the order to the factory
-    const orderInfo = { diner: { id: req.user.id, name: req.user.name, email: req.user.email }, orderTotal, order };
+    const orderInfo = {
+      orderTotal,
+      itemsCount: order.items.length,
+      diner: { id: req.user.id, name: req.user.name, email: req.user.email },
+      order,
+    };
     logger.factoryLogger(orderInfo);
     const r = await metrics.trackPizzaCreationLatency(
       () => fetch(`${config.factory.url}/api/order`, {

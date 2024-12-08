@@ -45,7 +45,7 @@ authRouter.endpoints = [
     path: '/api/auth/chaos/:state',
     requiresAuth: true,
     description: 'Set chaos state of service',
-    example: `curl -X PUR localhost:3000/api/auth/chaos/true -H 'Authorization: Bearer tttttt'`,
+    example: `curl -X PUT localhost:3000/api/auth/chaos/true -H 'Authorization: Bearer tttttt'`,
     response: { chaos: 'true' },
   },
 ];
@@ -166,7 +166,7 @@ authRouter.put(
 
 async function setAuth(user) {
   const tokenPayload = {...user, token_salt: Math.random(), timestamp: +new Date};
-  const token = jwt.sign(tokenPayload, config.jwtSecret);
+  const token = jwt.sign(tokenPayload, config.jwtSecret, { expiresIn: "24h" });
   await DB.loginUser(user.id, token);
   return token;
 }
