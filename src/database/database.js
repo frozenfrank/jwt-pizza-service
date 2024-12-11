@@ -100,20 +100,25 @@ class DB {
     const connection = await this.getConnection();
     try {
       const params = [];
+      const values = [];
       if (password) {
         const hashedPassword = await bcrypt.hash(password, 10);
-        params.push(`password='${hashedPassword}'`);
+        params.push(`password=?`);
+        values.push(hashedPassword);
       }
       if (email) {
-        params.push(`email='${email}'`);
+        params.push(`email=?`);
+        values.push(email);
       }
       if (name) {
-        params.push(`name='${name}'`);
+        params.push(`name=?`);
+        values.push(name);
       }
 
       if (params.length > 0) {
-        const query = `UPDATE user SET ${params.join(', ')} WHERE id=${userId}`;
-        await this.query(connection, query);
+        values.push(userId)
+        const query = `UPDATE user SET ${params.join(', ')} WHERE id=?`;
+        await this.query(connection, query, values);
       }
       return this.getUser(email, password);
     } finally {
@@ -156,7 +161,7 @@ class DB {
     const connection = await this.getConnection();
     try {
       const offset = this.getOffset(page, config.db.listPerPage);
-      const orders = await this.query(connection, `SELECT id, franchiseId, storeId, date FROM dinerOrder WHERE dinerId=? LIMIT ${offset},${config.db.listPerPage}`, [user.id]);
+      const orders = await this.query(connection, `SELECT id, franchiseId, storeId, date FROM dinerOrder WHERE dinerId=? LIMIT ?,?`, [user.id, offset, config.db.listPerPage]);
       for (const order of orders) {
         let items = await this.query(connection, `SELECT id, menuId, description, price FROM orderItem WHERE orderId=?`, [order.id]);
         order.items = items;
@@ -250,6 +255,7 @@ class DB {
       }
 
       franchiseIds = franchiseIds.map((v) => v.objectId);
+      // Watch out for a SQL injection here!
       const franchises = await this.query(connection, `SELECT id, name FROM franchise WHERE id in (${franchiseIds.join(',')})`);
       for (const franchise of franchises) {
         await this.getFranchise(franchise);
@@ -315,7 +321,7 @@ class DB {
   }
 
   async getID(connection, key, value, table) {
-    const rows = await this.query(connection, `SELECT id FROM ${table} WHERE ${key}=?`, [value]);
+    const rows = await this.query(connection, `SELECT id FROM ? WHERE ?=?`, [table, key, value]);
     if (rows.length > 0) {
       return rows[0].id;
     }
